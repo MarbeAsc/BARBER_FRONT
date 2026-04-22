@@ -339,9 +339,7 @@ export function Login() {
                 <button
                   type="button"
                   className="text-right text-[0.8125rem] font-semibold text-blue-700 underline-offset-[3px] transition-colors hover:text-blue-800 hover:underline"
-                  onClick={() => {
-                    /* placeholder para flujo real */
-                  }}
+                  onClick={() => navigate('/forgot-password')}
                 >
                   ¿Olvidaste tu contraseña?
                 </button>
@@ -407,9 +405,7 @@ export function Login() {
                 <button
                   type="button"
                   className="text-right text-[0.8125rem] font-semibold text-blue-700 underline-offset-[3px] transition-colors hover:text-blue-800 hover:underline"
-                  onClick={() => {
-                    /* placeholder para flujo real */
-                  }}
+                  onClick={() => navigate('/register')}
                 >
                   Registrarse
                 </button>

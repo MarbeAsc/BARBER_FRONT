@@ -3,13 +3,17 @@ import { AppShell } from './components/AppShell'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { RoleRoute } from './components/RoleRoute'
 import { RootLayout } from './layouts/RootLayout'
+import { ForgotPassword } from './pages/ForgotPassword'
 import { Login } from './pages/Login'
+import { Register } from './pages/Register'
 
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
       { path: 'login', element: <Login /> },
+      { path: 'forgot-password', element: <ForgotPassword /> },
+      { path: 'register', element: <Register /> },
       {
         element: <ProtectedRoute />,
         children: [
@@ -52,6 +56,13 @@ export const router = createBrowserRouter([
                     lazy: async () => {
                       const { AdminBarberosPage } = await import('./pages/admin/AdminBarberosPage')
                       return { Component: AdminBarberosPage }
+                    },
+                  },
+                  {
+                    path: 'usuarios',
+                    lazy: async () => {
+                      const { AdminUsuariosPage } = await import('./pages/admin/AdminUsuariosPage')
+                      return { Component: AdminUsuariosPage }
                     },
                   },
                 ],

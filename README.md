@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+# Sistema de Gestion para Barberia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacion web para administrar servicios de barberia y agendar citas con control por roles fijos.
 
-Currently, two official plugins are available:
+## Objetivo del sistema
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Centralizar en una sola plataforma:
 
-## React Compiler
+- La administracion de servicios, perfumes, barberos y relaciones entre ellos.
+- La visualizacion de citas programadas para cada barbero.
+- La reserva de citas por parte de clientes segun servicio, barbero, fecha y hora.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Flujo principal del negocio
 
-## Expanding the ESLint configuration
+1. El usuario inicia sesion.
+2. El sistema identifica su rol (administrador, barbero o cliente).
+3. Se redirige al panel correspondiente.
+4. Cada rol solo visualiza la informacion y acciones que le competen.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+> Los roles son fijos e inalterables en esta fase del proyecto: `administrador`, `barbero` y `cliente`.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Roles y responsabilidades
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Administrador
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+El administrador dispone de un panel para gestionar:
+
+- Servicios.
+- Anadidos de los servicios.
+- Perfumes.
+- Barberos.
+
+Regla clave:
+
+- Cada barbero debe estar relacionado con los servicios que sabe realizar.
+
+### Barbero
+
+El barbero visualiza:
+
+- Sus citas programadas.
+- Solo las citas que estan relacionadas con sus servicios asignados.
+
+### Cliente
+
+El cliente puede:
+
+- Ver servicios disponibles.
+- Ver que barberos ofrecen cada servicio.
+- Elegir fecha y hora en calendario para agendar su cita.
+
+## Modulos funcionales esperados
+
+- **Autenticacion:** inicio de sesion y redireccion por rol.
+- **Panel administrador:** CRUD de servicios, anadidos, perfumes y barberos.
+- **Relacion barbero-servicio:** asignaciones para definir que puede atender cada barbero.
+- **Agenda del barbero:** listado de citas programadas.
+- **Reserva del cliente:** seleccion de servicio, barbero, fecha y hora.
+
+## Alcance actual
+
+El enfoque actual prioriza el flujo base por roles sobre un esquema avanzado de permisos.
+
+- Roles fijos para simplificar la operacion inicial.
+- Evolucion futura posible hacia permisos granulares por modulo.
+
+## Stack tecnico
+
+- React 19 + TypeScript
+- Vite
+- React Router
+- TanStack Query
+- Axios
+- Tailwind CSS
+- Recharts
+
+## Scripts del proyecto
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Otros scripts:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run build`: genera build de produccion.
+- `npm run preview`: sirve la build localmente.
+- `npm run lint`: ejecuta ESLint.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Nota de producto
+
+Este README documenta el flujo funcional objetivo acordado para la primera version operativa del sistema.

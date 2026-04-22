@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { inferRoleFromEmail, type UserRole } from '../lib/roles'
 
 type NavItem = {
   to: string
@@ -15,13 +16,23 @@ type NavigationBarProps = {
   onLogout: () => void
 }
 
-const navItems: NavItem[] = [
-  { to: '/', label: 'Panel general' },
-  { to: '/tareas', label: 'Agenda' },
-  { to: '/equipo', label: 'Barberos' },
-  { to: '/informes', label: 'Informes' },
-  { to: '/ajustes', label: 'Ajustes' },
-]
+const navItemsByRole: Record<UserRole, NavItem[]> = {
+  admin: [
+    { to: '/', label: 'Panel general' },
+    { to: '/servicios', label: 'Servicios' },
+    { to: '/anadidos', label: 'Añadidos' },
+    { to: '/perfumes', label: 'Perfumes' },
+    { to: '/barberos', label: 'Barberos' },
+  ],
+  barbero: [
+    { to: '/', label: 'Panel general' },
+    { to: '/mis-citas', label: 'Mis citas' },
+  ],
+  cliente: [
+    { to: '/', label: 'Panel general' },
+    { to: '/mis-reservas', label: 'Reservar cita' },
+  ],
+}
 
 function TasksBrandIcon({ className }: { className?: string }) {
   return (
@@ -62,6 +73,9 @@ export function NavigationBar({
   onCloseMenu,
   onLogout,
 }: NavigationBarProps) {
+  const role = inferRoleFromEmail(userEmail)
+  const navItems = navItemsByRole[role]
+
   return (
     <>
       <header className="sticky top-0 z-50 flex items-center gap-3 border-b border-amber-500/35 bg-linear-to-r from-[#121216] via-[#15151b] to-[#0f0f14] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_8px_28px_-12px_rgba(0,0,0,0.6)] sm:px-5">
@@ -76,7 +90,7 @@ export function NavigationBar({
           <HamburgerIcon open={menuOpen} />
         </button>
         <span className="text-sm font-semibold tracking-tight text-amber-100/95">
-          BarberFlow Pro
+        BarberShop
         </span>
         <div className="min-w-0 flex-1 text-right text-xs font-bold text-white sm:text-sm">
           <span className="hidden truncate rounded-full border border-amber-400/35 bg-amber-800/25 p-4 sm:inline">

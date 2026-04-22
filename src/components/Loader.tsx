@@ -14,10 +14,12 @@ function pathToPanelLabel(pathname: string): string {
   if (p === '/') return 'Panel general'
   const map: Record<string, string> = {
     '/login': 'Inicio de sesión',
-    '/tareas': 'Agenda',
-    '/equipo': 'Barberos',
-    '/informes': 'Informes',
-    '/ajustes': 'Ajustes',
+    '/servicios': 'Servicios',
+    '/anadidos': 'Añadidos',
+    '/perfumes': 'Perfumes',
+    '/barberos': 'Barberos',
+    '/mis-citas': 'Mis citas',
+    '/mis-reservas': 'Mis reservas',
   }
   return map[p] ?? 'Pantalla'
 }

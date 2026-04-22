@@ -1,142 +1,135 @@
-import { useAuth } from "../context/AuthContext";
-import { useMemo, useState } from "react";
-
-type UserRole = "admin" | "barbero" | "cliente";
+import { useAuth } from '../context/AuthContext'
+import { useMemo } from 'react'
+import { inferRoleFromEmail, roleLabel, type UserRole } from '../lib/roles'
 
 type Kpi = {
-  label: string;
-  value: string;
-  delta: string;
-};
-
-type Appointment = {
-  hour: string;
-  client: string;
-  service: string;
-  barber: string;
-  status: string;
-  statusClass: string;
-};
-
-function inferRoleFromEmail(email?: string): UserRole {
-  const source = (email ?? "").toLowerCase();
-  if (source.includes("admin")) return "admin";
-  if (source.includes("barber") || source.includes("barbero")) return "barbero";
-  return "cliente";
+  label: string
+  value: string
+  delta: string
 }
 
-function roleLabel(role: UserRole) {
-  if (role === "admin") return "Administrador";
-  if (role === "barbero") return "Barbero";
-  return "Cliente";
+type Appointment = {
+  hour: string
+  client: string
+  service: string
+  barber: string
+  status: string
+  statusClass: string
 }
 
 export function Dashboard() {
-  const { user } = useAuth();
-  const inferredRole = useMemo(() => inferRoleFromEmail(user?.email), [user?.email]);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(inferredRole);
+  const { user } = useAuth()
+  const selectedRole = useMemo(() => inferRoleFromEmail(user?.email), [user?.email])
 
   const kpisByRole: Record<UserRole, Kpi[]> = {
     admin: [
-      { label: "Servicios activos", value: "18", delta: "3 con extras nuevos" },
-      { label: "Barberos registrados", value: "6", delta: "1 disponible hoy" },
-      { label: "Citas del dia", value: "32", delta: "+14% vs. ayer" },
-      { label: "Ingresos estimados", value: "$1,280", delta: "Ticket prom. $41" },
+      { label: 'Servicios activos', value: '18', delta: '3 con extras nuevos' },
+      { label: 'Barberos registrados', value: '6', delta: '1 disponible hoy' },
+      { label: 'Citas del dia', value: '32', delta: '+14% vs. ayer' },
+      { label: 'Ingresos estimados', value: '$1,280', delta: 'Ticket prom. $41' },
     ],
     barbero: [
-      { label: "Mis citas hoy", value: "8", delta: "2 en curso" },
-      { label: "Servicios del dia", value: "6", delta: "Fade y barba lideran" },
-      { label: "Clientes atendidos", value: "5", delta: "Buen ritmo" },
-      { label: "Proxima cita", value: "11:45", delta: "David Perea" },
+      { label: 'Mis citas hoy', value: '8', delta: '2 en curso' },
+      { label: 'Por atender', value: '3', delta: 'Próxima: 11:45' },
+      { label: 'Atendidas', value: '5', delta: 'Buen ritmo de trabajo' },
+      { label: 'Disponibilidad', value: '2 hrs', delta: 'Huecos entre 14:00 y 16:00' },
     ],
     cliente: [
-      { label: "Mis reservas", value: "2", delta: "1 para esta semana" },
-      { label: "Servicios favoritos", value: "3", delta: "Corte clasico top" },
-      { label: "Barberos sugeridos", value: "4", delta: "Segun tu historial" },
-      { label: "Disponibilidad", value: "Hoy", delta: "Slots desde 15:30" },
+      { label: 'Mis reservas', value: '2', delta: '1 para esta semana' },
+      { label: 'Servicios favoritos', value: '3', delta: 'Corte clasico top' },
+      { label: 'Barberos sugeridos', value: '4', delta: 'Segun tu historial' },
+      { label: 'Disponibilidad', value: 'Hoy', delta: 'Slots desde 15:30' },
     ],
-  };
+  }
 
   const appointmentsByRole: Record<UserRole, Appointment[]> = {
     admin: [
       {
-        hour: "09:30",
-        client: "Carlos Mendoza",
-        service: "Corte + barba",
-        barber: "Luis",
-        status: "En curso",
-        statusClass: "bg-blue-100 text-blue-700",
+        hour: '09:30',
+        client: 'Carlos Mendoza',
+        service: 'Corte + barba',
+        barber: 'Luis',
+        status: 'En curso',
+        statusClass: 'bg-blue-100 text-blue-700',
       },
       {
-        hour: "10:15",
-        client: "Miguel Torres",
-        service: "Fade premium",
-        barber: "Jorge",
-        status: "Confirmada",
-        statusClass: "bg-emerald-100 text-emerald-700",
+        hour: '10:15',
+        client: 'Miguel Torres',
+        service: 'Fade premium',
+        barber: 'Jorge',
+        status: 'Confirmada',
+        statusClass: 'bg-emerald-100 text-emerald-700',
       },
       {
-        hour: "11:00",
-        client: "Andres Rivas",
-        service: "Corte clasico",
-        barber: "Dario",
-        status: "Pendiente",
-        statusClass: "bg-amber-100 text-amber-700",
+        hour: '11:00',
+        client: 'Andres Rivas',
+        service: 'Corte clasico',
+        barber: 'Dario',
+        status: 'Pendiente',
+        statusClass: 'bg-amber-100 text-amber-700',
       },
     ],
     barbero: [
       {
-        hour: "10:30",
-        client: "Luis Herrera",
-        service: "Corte skin fade",
-        barber: "Tu",
-        status: "Confirmada",
-        statusClass: "bg-emerald-100 text-emerald-700",
+        hour: '10:30',
+        client: 'Luis Herrera',
+        service: 'Corte skin fade',
+        barber: user?.name ?? 'Tú',
+        status: 'Confirmada',
+        statusClass: 'bg-emerald-100 text-emerald-700',
       },
       {
-        hour: "11:45",
-        client: "David Perea",
-        service: "Arreglo de barba",
-        barber: "Tu",
-        status: "Pendiente",
-        statusClass: "bg-amber-100 text-amber-700",
+        hour: '11:45',
+        client: 'David Perea',
+        service: 'Arreglo de barba',
+        barber: user?.name ?? 'Tú',
+        status: 'Pendiente',
+        statusClass: 'bg-amber-100 text-amber-700',
       },
       {
-        hour: "13:00",
-        client: "Marco Solis",
-        service: "Corte + cejas",
-        barber: "Tu",
-        status: "Pendiente",
-        statusClass: "bg-amber-100 text-amber-700",
+        hour: '13:00',
+        client: 'Marco Solis',
+        service: 'Corte + cejas',
+        barber: user?.name ?? 'Tú',
+        status: 'Pendiente',
+        statusClass: 'bg-amber-100 text-amber-700',
+      },
+      {
+        hour: '15:00',
+        client: 'Javier Ochoa',
+        service: 'Corte clásico',
+        barber: user?.name ?? 'Tú',
+        status: 'Confirmada',
+        statusClass: 'bg-emerald-100 text-emerald-700',
       },
     ],
     cliente: [
       {
-        hour: "15:30",
-        client: user?.name ?? "Tu reserva",
-        service: "Corte clasico",
-        barber: "Luis",
-        status: "Disponible",
-        statusClass: "bg-emerald-100 text-emerald-700",
+        hour: '15:30',
+        client: user?.name ?? 'Tu reserva',
+        service: 'Corte clasico',
+        barber: 'Luis',
+        status: 'Disponible',
+        statusClass: 'bg-emerald-100 text-emerald-700',
       },
       {
-        hour: "16:15",
-        client: user?.name ?? "Tu reserva",
-        service: "Corte + barba",
-        barber: "Jorge",
-        status: "Pocas plazas",
-        statusClass: "bg-amber-100 text-amber-700",
+        hour: '16:15',
+        client: user?.name ?? 'Tu reserva',
+        service: 'Corte + barba',
+        barber: 'Jorge',
+        status: 'Pocas plazas',
+        statusClass: 'bg-amber-100 text-amber-700',
       },
       {
-        hour: "17:00",
-        client: user?.name ?? "Tu reserva",
-        service: "Perfilado",
-        barber: "Dario",
-        status: "Disponible",
-        statusClass: "bg-emerald-100 text-emerald-700",
+        hour: '17:00',
+        client: user?.name ?? 'Tu reserva',
+        service: 'Perfilado',
+        barber: 'Dario',
+        status: 'Disponible',
+        statusClass: 'bg-emerald-100 text-emerald-700',
       },
     ],
-  };
+  }
 
   return (
     <div className="w-full min-w-0 bg-white">
@@ -152,22 +145,6 @@ export function Dashboard() {
           <p className="mt-1 text-xs font-medium text-amber-700/90">
             Vista activa: {roleLabel(selectedRole)}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {(["admin", "barbero", "cliente"] as UserRole[]).map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => setSelectedRole(role)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                  selectedRole === role
-                    ? "border-amber-300 bg-amber-100 text-amber-800"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-                }`}
-              >
-                {roleLabel(role)}
-              </button>
-            ))}
-          </div>
         </div>
         <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {kpisByRole[selectedRole].map((card) => (
@@ -191,14 +168,14 @@ export function Dashboard() {
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="text-base font-semibold text-slate-900">
-                {selectedRole === "admin" && "Citas globales de hoy"}
-                {selectedRole === "barbero" && "Tus citas programadas"}
-                {selectedRole === "cliente" && "Horarios recomendados"}
+                {selectedRole === 'admin' && 'Citas globales de hoy'}
+                {selectedRole === 'barbero' && 'Tus citas programadas'}
+                {selectedRole === 'cliente' && 'Horarios recomendados'}
               </h2>
               <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                {selectedRole === "admin" && "32 citas programadas"}
-                {selectedRole === "barbero" && "8 citas asignadas"}
-                {selectedRole === "cliente" && "Slots disponibles hoy"}
+                {selectedRole === 'admin' && '32 citas programadas'}
+                {selectedRole === 'barbero' && '4 citas asignadas'}
+                {selectedRole === 'cliente' && 'Slots disponibles hoy'}
               </span>
             </div>
 
@@ -238,35 +215,35 @@ export function Dashboard() {
           <aside className="space-y-4">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-sm font-semibold text-slate-900">
-                {selectedRole === "admin" && "Panel administrativo"}
-                {selectedRole === "barbero" && "Tu rendimiento"}
-                {selectedRole === "cliente" && "Tu cuenta"}
+                {selectedRole === 'admin' && 'Panel administrativo'}
+                {selectedRole === 'barbero' && 'Resumen operativo'}
+                {selectedRole === 'cliente' && 'Tu cuenta'}
               </h3>
               <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
-                {selectedRole === "admin" && "$1,280"}
-                {selectedRole === "barbero" && "5/8"}
-                {selectedRole === "cliente" && "2"}
+                {selectedRole === 'admin' && '$1,280'}
+                {selectedRole === 'barbero' && '5/8'}
+                {selectedRole === 'cliente' && '2'}
               </p>
               <p className="mt-1 text-xs text-emerald-600">
-                {selectedRole === "admin" && "+8% comparado con ayer"}
-                {selectedRole === "barbero" && "Citas atendidas hoy"}
-                {selectedRole === "cliente" && "Reservas activas"}
+                {selectedRole === 'admin' && '+8% comparado con ayer'}
+                {selectedRole === 'barbero' && 'Citas atendidas hoy'}
+                {selectedRole === 'cliente' && 'Reservas activas'}
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                 <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                  <p>{selectedRole === "cliente" ? "Favoritos" : "Indicador A"}</p>
+                  <p>{selectedRole === 'barbero' ? 'Tiempo promedio' : selectedRole === 'cliente' ? 'Favoritos' : 'Indicador A'}</p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === "admin" && "31"}
-                    {selectedRole === "barbero" && "4.9"}
-                    {selectedRole === "cliente" && "3"}
+                    {selectedRole === 'admin' && '31'}
+                    {selectedRole === 'barbero' && '42 min'}
+                    {selectedRole === 'cliente' && '3'}
                   </p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                  <p>{selectedRole === "cliente" ? "Ultimo corte" : "Indicador B"}</p>
+                  <p>{selectedRole === 'barbero' ? 'Siguiente hueco' : selectedRole === 'cliente' ? 'Ultimo corte' : 'Indicador B'}</p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === "admin" && "$41"}
-                    {selectedRole === "barbero" && "6"}
-                    {selectedRole === "cliente" && "Hace 12 dias"}
+                    {selectedRole === 'admin' && '$41'}
+                    {selectedRole === 'barbero' && '14:00'}
+                    {selectedRole === 'cliente' && 'Hace 12 dias'}
                   </p>
                 </div>
               </div>
@@ -281,25 +258,25 @@ export function Dashboard() {
                   type="button"
                   className="w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
-                  {selectedRole === "admin" && "Gestionar servicios"}
-                  {selectedRole === "barbero" && "Iniciar cita"}
-                  {selectedRole === "cliente" && "Reservar cita"}
+                  {selectedRole === 'admin' && 'Gestionar servicios'}
+                  {selectedRole === 'barbero' && 'Iniciar siguiente cita'}
+                  {selectedRole === 'cliente' && 'Reservar cita'}
                 </button>
                 <button
                   type="button"
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-amber-300 hover:text-slate-900"
                 >
-                  {selectedRole === "admin" && "Asignar barbero"}
-                  {selectedRole === "barbero" && "Ver servicios que realizo"}
-                  {selectedRole === "cliente" && "Ver barberos disponibles"}
+                  {selectedRole === 'admin' && 'Asignar barbero'}
+                  {selectedRole === 'barbero' && 'Ver servicios asignados'}
+                  {selectedRole === 'cliente' && 'Ver barberos disponibles'}
                 </button>
                 <button
                   type="button"
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-amber-300 hover:text-slate-900"
                 >
-                  {selectedRole === "admin" && "Administrar perfumes y extras"}
-                  {selectedRole === "barbero" && "Historial del dia"}
-                  {selectedRole === "cliente" && "Reprogramar cita"}
+                  {selectedRole === 'admin' && 'Administrar perfumes y extras'}
+                  {selectedRole === 'barbero' && 'Historial del día'}
+                  {selectedRole === 'cliente' && 'Reprogramar cita'}
                 </button>
               </div>
             </section>
@@ -307,5 +284,5 @@ export function Dashboard() {
         </div>
       </main>
     </div>
-  );
-} 
+  )
+}

@@ -25,6 +25,24 @@ function deriveNameFromEmail(email: string) {
 /** Pon en `false` cuando la API de autenticación esté lista. Mientras tanto, entrar al panel no valida credenciales. */
 const PLACEHOLDER_LOGIN = true;
 
+const DEMO_USERS = {
+  admin: {
+    label: "Entrar como Administrador",
+    email: "admin@barberia.com",
+    password: "admin123",
+  },
+  barbero: {
+    label: "Entrar como Barbero",
+    email: "barbero@barberia.com",
+    password: "barbero123",
+  },
+  cliente: {
+    label: "Entrar como Cliente",
+    email: "cliente@barberia.com",
+    password: "cliente123",
+  },
+} as const;
+
 export function Login() {
   const emailId = useId();
   const passwordId = useId();
@@ -71,13 +89,15 @@ export function Login() {
     return {};
   }, [email, password]);
 
-  const runSubmit = async () => {
+  const runSubmit = async (credentials?: { email?: string; password?: string }) => {
     setFormError(null);
+    const emailInput = credentials?.email ?? email;
+    const passwordInput = credentials?.password ?? password;
 
     if (PLACEHOLDER_LOGIN) {
       setIsSubmitting(true);
       try {
-        const trimmed = email.trim();
+        const trimmed = emailInput.trim();
         const emailOk = z.string().email().safeParse(trimmed).success;
         const emailVal = emailOk ? trimmed : "demo@taskflow.app";
         login({
@@ -92,7 +112,7 @@ export function Login() {
     }
 
     setTouched({ email: true, password: true });
-    const parsed = loginSchema.safeParse({ email, password });
+    const parsed = loginSchema.safeParse({ email: emailInput, password: passwordInput });
     if (!parsed.success) return;
 
     setIsSubmitting(true);
@@ -108,6 +128,13 @@ export function Login() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const loginAsDemoUser = (demo: (typeof DEMO_USERS)[keyof typeof DEMO_USERS]) => {
+    setEmail(demo.email);
+    setPassword(demo.password);
+    setTouched({ email: true, password: true });
+    void runSubmit({ email: demo.email, password: demo.password });
   };
 
   const emailError = touched.email ? fieldErrors.email : undefined;
@@ -343,6 +370,36 @@ export function Login() {
                   "Iniciar sesión"
                 )}
               </button>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                <p className="mb-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  Accesos de prueba
+                </p>
+                <div className="grid gap-2">
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    onClick={() => loginAsDemoUser(DEMO_USERS.admin)}
+                  >
+                    {DEMO_USERS.admin.label}
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    onClick={() => loginAsDemoUser(DEMO_USERS.barbero)}
+                  >
+                    {DEMO_USERS.barbero.label}
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    onClick={() => loginAsDemoUser(DEMO_USERS.cliente)}
+                  >
+                    {DEMO_USERS.cliente.label}
+                  </button>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5">
                 <span className="text-left text-[0.8125rem] text-slate-500">
                   Barber v1.0

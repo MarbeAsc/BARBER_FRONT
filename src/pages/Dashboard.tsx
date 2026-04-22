@@ -125,7 +125,7 @@ export function Dashboard() {
         service: "Corte + barba",
         barber: "Jorge",
         status: "Pocas plazas",
-        statusClass: "bg-amber-100 text-amber-600",
+        statusClass: "bg-amber-100 text-amber-700",
       },
       {
         hour: "17:00",

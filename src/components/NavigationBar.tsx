@@ -23,6 +23,7 @@ const navItemsByRole: Record<UserRole, NavItem[]> = {
     { to: '/anadidos', label: 'Añadidos' },
     { to: '/perfumes', label: 'Perfumes' },
     { to: '/barberos', label: 'Barberos' },
+    { to: '/usuarios', label: 'Usuarios' },
   ],
   barbero: [
     { to: '/', label: 'Panel general' },

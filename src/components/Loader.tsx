@@ -18,8 +18,11 @@ function pathToPanelLabel(pathname: string): string {
     '/anadidos': 'Añadidos',
     '/perfumes': 'Perfumes',
     '/barberos': 'Barberos',
+    '/usuarios': 'Usuarios',
     '/mis-citas': 'Mis citas',
     '/mis-reservas': 'Mis reservas',
+    '/forgot-password': 'Recuperar contraseña',
+    '/register': 'Registro',
   }
   return map[p] ?? 'Pantalla'
 }

@@ -23,6 +23,10 @@ function badgeClass(status: BookingRow['estado']) {
 }
 
 export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookingsTableProps) {
+  const confirmedCount = rows.filter((row) => row.estado === 'Confirmada').length
+  const pendingCount = rows.filter((row) => row.estado === 'Pendiente').length
+  const rescheduledCount = rows.filter((row) => row.estado === 'Reprogramada').length
+
   const columns: MRT_ColumnDef<BookingRow>[] = [
     { accessorKey: 'servicio', header: 'Servicio' },
     { accessorKey: 'barbero', header: 'Barbero' },
@@ -63,6 +67,11 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
         size: 140,
       },
     },
+    renderTopToolbarCustomActions: () => (
+      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+        Tip: revisa estado y fecha antes de editar
+      </span>
+    ),
     renderRowActions: ({ row }) => (
       <div className="inline-flex gap-2">
         <CustomButton
@@ -101,9 +110,51 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
     muiTablePaperProps: {
       elevation: 0,
       sx: {
-        border: '1px solid #e2e8f0',
-        borderRadius: '0.75rem',
+        border: '1px solid #dbe4f0',
+        borderRadius: '0.9rem',
         overflow: 'hidden',
+        boxShadow: '0 8px 28px -20px rgba(37, 99, 235, 0.35)',
+      },
+    },
+    muiTopToolbarProps: {
+      sx: {
+        background: 'linear-gradient(90deg, rgba(239,246,255,0.7) 0%, rgba(248,250,252,0.7) 100%)',
+        borderBottom: '1px solid #e2e8f0',
+        px: '0.75rem',
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: '#f8fafc',
+        color: '#334155',
+        fontWeight: 700,
+        fontSize: '0.74rem',
+        borderBottom: '1px solid #e2e8f0',
+      },
+    },
+    muiTableBodyRowProps: ({ row }) => ({
+      sx: {
+        backgroundColor: row.index % 2 === 0 ? '#ffffff' : '#f8fafc',
+        '&:hover td': {
+          backgroundColor: '#eff6ff',
+        },
+      },
+    }),
+    muiTableBodyCellProps: {
+      sx: {
+        borderBottom: '1px solid #e2e8f0',
+        fontSize: '0.835rem',
+      },
+    },
+    muiSearchTextFieldProps: {
+      placeholder: 'Buscar por servicio, barbero o fecha...',
+      size: 'small',
+      sx: {
+        minWidth: '300px',
+        '& .MuiOutlinedInput-root': {
+          borderRadius: '12px',
+          backgroundColor: '#ffffff',
+        },
       },
     },
     muiPaginationProps: {
@@ -120,6 +171,20 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
         <p className="mt-1 text-sm text-slate-500">
           Consulta y da seguimiento a tus citas agendadas.
         </p>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs sm:max-w-md">
+          <article className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+            <p className="text-slate-500">Total</p>
+            <p className="text-base font-semibold text-slate-900">{rows.length}</p>
+          </article>
+          <article className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+            <p className="text-emerald-700">Confirmadas</p>
+            <p className="text-base font-semibold text-emerald-800">{confirmedCount}</p>
+          </article>
+          <article className="rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2">
+            <p className="text-blue-700">Pendientes/Reprogramadas</p>
+            <p className="text-base font-semibold text-blue-800">{pendingCount + rescheduledCount}</p>
+          </article>
+        </div>
       </div>
       <div className="p-4">
         <MaterialReactTable table={table} />

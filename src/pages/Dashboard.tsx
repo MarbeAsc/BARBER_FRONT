@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CustomButton } from '../components/Button'
 import { inferRoleFromEmail, roleLabel, type UserRole } from '../lib/roles'
 import { showNotification } from '../lib/notifications'
 
@@ -26,37 +27,34 @@ export function Dashboard() {
 
   const quickActionsByRole: Record<
     UserRole,
-    Array<{ label: string; className: string; onClick: () => void }>
+    Array<{ label: string; variant?: 'primary' | 'secondary'; onClick: () => void }>
   > = {
     admin: [
       {
         label: 'Gestionar servicios',
-        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        variant: 'primary',
         onClick: () => navigate('/servicios'),
       },
       {
         label: 'Asignar barbero',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () => navigate('/barberos'),
       },
       {
         label: 'Administrar perfumes y extras',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () => navigate('/perfumes'),
       },
     ],
     barbero: [
       {
         label: 'Iniciar siguiente cita',
-        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        variant: 'primary',
         onClick: () => navigate('/mis-citas'),
       },
       {
         label: 'Ver servicios asignados',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () =>
           showNotification({
             title: 'Módulo en preparación',
@@ -66,8 +64,7 @@ export function Dashboard() {
       },
       {
         label: 'Historial del día',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () =>
           showNotification({
             title: 'Módulo en preparación',
@@ -79,19 +76,17 @@ export function Dashboard() {
     cliente: [
       {
         label: 'Reservar cita',
-        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        variant: 'primary',
         onClick: () => navigate('/mis-reservas'),
       },
       {
         label: 'Ver barberos disponibles',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () => navigate('/mis-reservas'),
       },
       {
         label: 'Reprogramar cita',
-        className:
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        variant: 'secondary',
         onClick: () =>
           showNotification({
             title: 'Acción pendiente',
@@ -365,14 +360,16 @@ export function Dashboard() {
               </h3>
               <div className="mt-3 space-y-2">
                 {quickActionsByRole[selectedRole].map((action) => (
-                  <button
+                  <CustomButton
                     key={action.label}
                     type="button"
-                    className={action.className}
+                    variant={action.variant ?? 'secondary'}
+                    size="lg"
+                    className="w-full rounded-lg"
                     onClick={action.onClick}
                   >
                     {action.label}
-                  </button>
+                  </CustomButton>
                 ))}
               </div>
             </section>

@@ -57,7 +57,23 @@ export function ClienteReservasPage() {
         horasDisponibles={horasDisponibles}
         onReservar={handleReservar}
       />
-      <ClienteBookingsTable rows={rows} />
+      <ClienteBookingsTable
+        rows={rows}
+        onEdit={(row) =>
+          showNotification({
+            title: 'Reservas',
+            message: `Editar reserva de ${row.servicio} (${row.fecha} ${row.hora}).`,
+            variant: 'warning',
+          })
+        }
+        onDelete={(row) =>
+          showNotification({
+            title: 'Reservas',
+            message: `Eliminar reserva de ${row.servicio} (${row.fecha} ${row.hora}).`,
+            variant: 'error',
+          })
+        }
+      />
     </main>
   )
 }

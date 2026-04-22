@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { CustomButton } from '../components/Button'
 import { showNotification } from '../lib/notifications'
 
 export function Register() {
@@ -168,35 +169,41 @@ export function Register() {
                 className="w-full rounded-xl border border-slate-300 px-3 py-2.5 pr-24 text-sm font-normal text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 placeholder="Mínimo 6 caracteres"
               />
-              <button
+              <CustomButton
                 type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-slate-300 p-1.5 text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                variant="ghost"
+                iconOnly
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-slate-300 p-1.5 text-slate-600 hover:border-blue-300 hover:text-blue-700"
                 onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                  {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
-              </button>
+                {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+              </CustomButton>
             </div>
           </label>
-          <button
+          <CustomButton
             type="submit"
-            className="sm:col-span-2 w-full rounded-xl bg-linear-to-r from-blue-600 to-blue-500 px-3 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-14px_rgba(37,99,235,0.8)] transition hover:brightness-110"
+            variant="primary"
+            size="lg"
+            className="sm:col-span-2 w-full rounded-xl"
           >
             Registrarme
-          </button>
+          </CustomButton>
         </form>
 
         <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4 text-sm">
           <Link to="/login" className="font-semibold text-blue-700 hover:text-blue-800">
             Volver a iniciar sesión
           </Link>
-          <button
+          <CustomButton
             type="button"
-            className="font-semibold text-blue-700 hover:text-blue-800"
+            variant="link"
+            size="sm"
+            className="p-0"
             onClick={() => navigate('/forgot-password')}
           >
             Recuperar contraseña
-          </button>
+          </CustomButton>
         </div>
         </div>
       </section>

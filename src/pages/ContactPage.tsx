@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaClock, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
+import { CustomButton } from '../components/Button'
 import { showNotification } from '../lib/notifications'
 
 export function ContactPage() {
@@ -153,12 +154,14 @@ export function ContactPage() {
                 placeholder="Cuéntanos qué necesitas..."
               />
             </label>
-            <button
+            <CustomButton
               type="submit"
-              className="sm:col-span-2 rounded-xl bg-linear-to-r from-blue-600 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-14px_rgba(37,99,235,0.8)] transition hover:brightness-110"
+              variant="primary"
+              size="lg"
+              className="sm:col-span-2 rounded-xl"
             >
               Enviar consulta
-            </button>
+            </CustomButton>
           </form>
 
           <div className="mt-5 border-t border-slate-200 pt-4 text-sm">

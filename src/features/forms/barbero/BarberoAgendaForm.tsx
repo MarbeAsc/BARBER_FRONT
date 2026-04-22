@@ -1,3 +1,5 @@
+import { CustomButton } from '../../../components/Button'
+
 export function BarberoAgendaForm() {
   return (
     <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -20,12 +22,14 @@ export function BarberoAgendaForm() {
           </select>
         </label>
         <div className="flex items-end">
-          <button
+          <CustomButton
             type="button"
-            className="w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+            variant="primary"
+            size="lg"
+            className="w-full rounded-lg"
           >
             Aplicar filtros
-          </button>
+          </CustomButton>
         </div>
       </div>
     </section>

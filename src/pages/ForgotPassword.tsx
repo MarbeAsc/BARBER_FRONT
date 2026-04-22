@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CustomButton } from '../components/Button'
 import { showNotification } from '../lib/notifications'
 
 export function ForgotPassword() {
@@ -91,9 +92,11 @@ export function ForgotPassword() {
           <div className="mt-5 space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
             <p className="font-semibold">Solicitud enviada correctamente</p>
             <p>Si el correo existe, recibirás instrucciones en unos minutos.</p>
-            <button
+            <CustomButton
               type="button"
-              className="rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+              variant="secondary"
+              size="sm"
+              className="rounded-lg border-emerald-300 text-emerald-700 hover:bg-emerald-100"
               onClick={() =>
                 showNotification({
                   title: 'Enlace reenviado',
@@ -103,7 +106,7 @@ export function ForgotPassword() {
               }
             >
               Reenviar enlace
-            </button>
+            </CustomButton>
           </div>
         ) : (
           <form
@@ -137,12 +140,14 @@ export function ForgotPassword() {
                 placeholder="cliente@barberia.com"
               />
             </label>
-            <button
+            <CustomButton
               type="submit"
-              className="w-full rounded-xl bg-linear-to-r from-blue-600 to-blue-500 px-3 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_-14px_rgba(37,99,235,0.8)] transition hover:brightness-110"
+              variant="primary"
+              size="lg"
+              className="w-full rounded-xl"
             >
               Enviar enlace de recuperación
-            </button>
+            </CustomButton>
           </form>
         )}
 

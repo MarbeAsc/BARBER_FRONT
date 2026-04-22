@@ -1,4 +1,11 @@
 import type { ReactNode } from 'react'
+import { FaPen, FaPlus, FaTrashAlt } from 'react-icons/fa'
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+  type MRT_ColumnDef,
+} from 'material-react-table'
+import { CustomButton } from '../../../components/Button'
 
 type Column<T> = {
   key: keyof T
@@ -13,6 +20,9 @@ type AdminCatalogTableProps<T extends Record<string, unknown>> = {
   addActionLabel: string
   columns: Array<Column<T>>
   rows: T[]
+  onAdd?: () => void
+  onEdit?: (row: T) => void
+  onDelete?: (row: T) => void
 }
 
 function statusBadge(value: unknown) {
@@ -35,12 +45,133 @@ export function AdminCatalogTable<T extends Record<string, unknown>>({
   addActionLabel,
   columns,
   rows,
+  onAdd,
+  onEdit,
+  onDelete,
 }: AdminCatalogTableProps<T>) {
   const activeCount = rows.filter((row) => {
     const state = String(row.estado ?? row.activo ?? '').toLowerCase()
     return state === 'activo' || state === 'true'
   }).length
   const inactiveCount = rows.length - activeCount
+
+  const mrtColumns: MRT_ColumnDef<T>[] = columns.map((column) => ({
+    accessorKey: String(column.key),
+    header: column.label,
+    Cell: ({ row }) => {
+      const value = row.original[column.key]
+      const content = column.render ? column.render(value, row.original) : String(value ?? '-')
+      return (
+        <span className={column.className ?? ''}>
+          {String(column.key).toLowerCase() === 'estado' ? statusBadge(value) : content}
+        </span>
+      )
+    },
+  }))
+
+  const table = useMaterialReactTable({
+    columns: mrtColumns,
+    data: rows,
+    enableColumnActions: false,
+    enableColumnFilters: true,
+    enableDensityToggle: false,
+    enableFullScreenToggle: false,
+    enableHiding: false,
+    enableGlobalFilter: true,
+    enableRowActions: true,
+    enableRowSelection: false,
+    positionActionsColumn: 'last',
+    initialState: {
+      showColumnFilters: true,
+      showGlobalFilter: true,
+      pagination: { pageIndex: 0, pageSize: 5 },
+    },
+    paginationDisplayMode: 'pages',
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        header: 'Acciones',
+        size: 140,
+      },
+    },
+    renderTopToolbarCustomActions: () => (
+      <CustomButton
+        type="button"
+        variant="primary"
+        leftIcon={<FaPlus className="h-3.5 w-3.5" />}
+        tooltip={addActionLabel}
+        className="rounded-lg"
+        onClick={onAdd}
+      >
+        {addActionLabel}
+      </CustomButton>
+    ),
+    renderRowActions: ({ row }) => (
+      <div className="inline-flex gap-2">
+        <CustomButton
+          type="button"
+          variant="ghost"
+          iconOnly
+          tooltip="Editar"
+          aria-label="Editar"
+          className="rounded-xl border border-blue-200 bg-blue-50/70 text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-100"
+          onClick={() => onEdit?.(row.original)}
+        >
+          <FaPen className="h-3.5 w-3.5" />
+        </CustomButton>
+        <CustomButton
+          type="button"
+          variant="danger"
+          iconOnly
+          tooltip="Eliminar"
+          aria-label="Eliminar"
+          className="rounded-xl border border-rose-200 bg-rose-50/80 text-rose-700 shadow-sm hover:border-rose-300 hover:bg-rose-100"
+          onClick={() => onDelete?.(row.original)}
+        >
+          <FaTrashAlt className="h-3.5 w-3.5" />
+        </CustomButton>
+      </div>
+    ),
+    localization: {
+      actions: 'Acciones',
+      and: 'y',
+      cancel: 'Cancelar',
+      clearFilter: 'Limpiar filtro',
+      clearSearch: 'Limpiar búsqueda',
+      clearSort: 'Limpiar orden',
+      filterByColumn: 'Filtrar por',
+      filterMode: 'Modo de filtro',
+      hideAll: 'Ocultar todo',
+      noRecordsToDisplay: 'No hay registros para mostrar',
+      noResultsFound: 'No se encontraron resultados',
+      search: 'Buscar',
+      showHideColumns: 'Mostrar/Ocultar columnas',
+      showHideFilters: 'Mostrar/Ocultar filtros',
+      sortByColumnAsc: 'Ordenar ascendente',
+      sortByColumnDesc: 'Ordenar descendente',
+      sortedByColumnAsc: 'Ordenado ascendente',
+      sortedByColumnDesc: 'Ordenado descendente',
+      thenBy: 'luego por',
+      toggleDensity: 'Cambiar densidad',
+      toggleFullScreen: 'Pantalla completa',
+      toggleSelectAll: 'Seleccionar todo',
+      toggleSelectRow: 'Seleccionar fila',
+      rowsPerPage: 'Filas por página',
+      of: 'de',
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        border: '1px solid #e2e8f0',
+        borderRadius: '0.75rem',
+        overflow: 'hidden',
+      },
+    },
+    muiPaginationProps: {
+      rowsPerPageOptions: [5, 10, 20],
+      showFirstButton: true,
+      showLastButton: true,
+    },
+  })
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -50,12 +181,6 @@ export function AdminCatalogTable<T extends Record<string, unknown>>({
             <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">{title}</h2>
             <p className="mt-1 text-xs text-slate-500 sm:text-sm">{description}</p>
           </div>
-          <button
-            type="button"
-            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            {addActionLabel}
-          </button>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2 text-xs sm:max-w-md">
@@ -74,62 +199,8 @@ export function AdminCatalogTable<T extends Record<string, unknown>>({
         </div>
       </div>
 
-      <div className="overflow-x-auto p-4">
-        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={String(column.key)}
-                  className={`border-b border-slate-200 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 ${column.className ?? ''}`}
-                >
-                  {column.label}
-                </th>
-              ))}
-              <th className="border-b border-slate-200 px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, idx) => (
-              <tr key={idx} className="bg-white transition-colors hover:bg-slate-50/70">
-                {columns.map((column) => {
-                  const value = row[column.key]
-                  const content = column.render
-                    ? column.render(value, row)
-                    : String(value ?? '-')
-                  return (
-                    <td
-                      key={String(column.key)}
-                      className={`border-b border-slate-100 px-3 py-2 text-sm text-slate-700 ${column.className ?? ''}`}
-                    >
-                      {String(column.key).toLowerCase() === 'estado'
-                        ? statusBadge(value)
-                        : content}
-                    </td>
-                  )
-                })}
-                <td className="border-b border-slate-100 px-3 py-2 text-right">
-                  <div className="inline-flex gap-2">
-                    <button
-                      type="button"
-                      className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="p-4">
+        <MaterialReactTable table={table} />
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 import { useAuth } from '../../context/AuthContext'
 import { BarberoAppointmentsTable } from '../../features/tables/barbero/BarberoAppointmentsTable'
-import { BarberoAgendaForm } from '../../features/forms/barbero/BarberoAgendaForm'
+import { showNotification } from '../../lib/notifications'
 
 const rows = [
   { hora: '09:30', cliente: 'Carlos Mendoza', servicio: 'Corte clásico', duracion: '30 min', estado: 'Finalizada' as const },
@@ -22,8 +22,24 @@ export function BarberoCitasPage() {
         </p>
       </header>
 
-      <BarberoAgendaForm />
-      <BarberoAppointmentsTable rows={rows} />
+     
+      <BarberoAppointmentsTable
+        rows={rows}
+        onEdit={(row) =>
+          showNotification({
+            title: 'Citas',
+            message: `Editar cita de ${row.cliente} (${row.hora}).`,
+            variant: 'warning',
+          })
+        }
+        onDelete={(row) =>
+          showNotification({
+            title: 'Citas',
+            message: `Eliminar cita de ${row.cliente} (${row.hora}).`,
+            variant: 'error',
+          })
+        }
+      />
     </main>
   )
 }

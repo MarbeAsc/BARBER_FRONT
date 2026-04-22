@@ -423,8 +423,9 @@ export function Login() {
             <button
               type="button"
               className="font-semibold text-blue-700 underline decoration-blue-300 underline-offset-[3px] transition-colors hover:text-blue-800 hover:decoration-blue-400"
+              onClick={() => navigate('/contacto')}
             >
-              comunícate con el administrador de tu barbería
+              contáctanos
             </button>
           </p>
         </div>

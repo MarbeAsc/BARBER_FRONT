@@ -23,6 +23,7 @@ function pathToPanelLabel(pathname: string): string {
     '/mis-reservas': 'Mis reservas',
     '/forgot-password': 'Recuperar contraseña',
     '/register': 'Registro',
+    '/contacto': 'Contacto',
   }
   return map[p] ?? 'Pantalla'
 }

@@ -1,9 +1,26 @@
+import { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import type { IconType } from 'react-icons'
+import {
+  FaCalendarAlt,
+  FaBars,
+  FaChevronDown,
+  FaCut,
+  FaHome,
+  FaPlusCircle,
+  FaSignOutAlt,
+  FaSprayCan,
+  FaUserCircle,
+  FaUserTie,
+  FaUsers,
+  FaTimes,
+} from 'react-icons/fa'
 import { inferRoleFromEmail, type UserRole } from '../lib/roles'
 
 type NavItem = {
   to: string
   label: string
+  icon: IconType
 }
 
 type NavigationBarProps = {
@@ -18,51 +35,21 @@ type NavigationBarProps = {
 
 const navItemsByRole: Record<UserRole, NavItem[]> = {
   admin: [
-    { to: '/', label: 'Panel general' },
-    { to: '/servicios', label: 'Servicios' },
-    { to: '/anadidos', label: 'Añadidos' },
-    { to: '/perfumes', label: 'Perfumes' },
-    { to: '/barberos', label: 'Barberos' },
-    { to: '/usuarios', label: 'Usuarios' },
+    { to: '/', label: 'Panel general', icon: FaHome },
+    { to: '/servicios', label: 'Servicios', icon: FaCut },
+    { to: '/anadidos', label: 'Añadidos', icon: FaPlusCircle },
+    { to: '/perfumes', label: 'Perfumes', icon: FaSprayCan },
+    { to: '/barberos', label: 'Barberos', icon: FaUserTie },
+    { to: '/usuarios', label: 'Usuarios', icon: FaUsers },
   ],
   barbero: [
-    { to: '/', label: 'Panel general' },
-    { to: '/mis-citas', label: 'Mis citas' },
+    { to: '/', label: 'Panel general', icon: FaHome },
+    { to: '/mis-citas', label: 'Mis citas', icon: FaCalendarAlt },
   ],
   cliente: [
-    { to: '/', label: 'Panel general' },
-    { to: '/mis-reservas', label: 'Reservar cita' },
+    { to: '/', label: 'Panel general', icon: FaHome },
+    { to: '/mis-reservas', label: 'Reservar cita', icon: FaCalendarAlt },
   ],
-}
-
-function TasksBrandIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M9 11l3 3L22 4" />
-      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-    </svg>
-  )
-}
-
-function HamburgerIcon({ open }: { open: boolean }) {
-  const bar =
-    'h-0.5 w-6 rounded-full bg-blue-50/95 transition-transform duration-200 ease-out'
-  return (
-    <span className="flex h-5 w-6 flex-col justify-center gap-[5px]" aria-hidden>
-      <span className={`${bar} ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
-      <span className={`${bar} ${open ? 'scale-x-0 opacity-0' : ''}`} />
-      <span className={`${bar} ${open ? '-translate-y-[7px] -rotate-45' : ''}`} />
-    </span>
-  )
 }
 
 export function NavigationBar({
@@ -76,6 +63,29 @@ export function NavigationBar({
 }: NavigationBarProps) {
   const role = inferRoleFromEmail(userEmail)
   const navItems = navItemsByRole[role]
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!profileOpen) return
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!profileRef.current) return
+      if (!profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [profileOpen])
+
+  const roleLabel = role === 'admin' ? 'Administrador' : role === 'barbero' ? 'Barbero' : 'Cliente'
 
   return (
     <>
@@ -88,23 +98,48 @@ export function NavigationBar({
           aria-controls={menuId}
           aria-label={menuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
         >
-          <HamburgerIcon open={menuOpen} />
+          {menuOpen ? <FaTimes className="h-5 w-5" /> : <FaBars className="h-5 w-5" />}
         </button>
         <span className="text-sm font-semibold tracking-tight text-blue-100/95">
         BarberShop
         </span>
-        <div className="min-w-0 flex-1 text-right text-xs font-bold text-white sm:text-sm">
-          <span className="hidden truncate rounded-full border border-blue-400/35 bg-blue-800/25 p-4 sm:inline">
-            {userEmail}
-          </span>
+        <div className="min-w-0 flex-1" />
+        <div className="relative" ref={profileRef}>
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-xl border border-blue-400/40 bg-blue-800/25 px-3 py-1.5 text-sm font-semibold text-blue-50 transition hover:bg-blue-700/40"
+            onClick={() => setProfileOpen((prev) => !prev)}
+            aria-expanded={profileOpen}
+            aria-haspopup="menu"
+          >
+            <FaUserCircle className="h-5 w-5 text-blue-100/90" />
+            <span className="max-w-[160px] truncate hidden sm:inline">{userEmail}</span>
+            <span className="sm:hidden">Perfil</span>
+            <FaChevronDown className={`h-3.5 w-3.5 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {profileOpen ? (
+            <div className="absolute right-0 top-[calc(100%+8px)] z-70 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-xl" role="menu">
+              <div className="rounded-lg bg-slate-50 px-3 py-2">
+                <p className="truncate text-sm font-semibold text-slate-900">{userName ?? 'Usuario'}</p>
+                <p className="truncate text-xs text-slate-500">{userEmail}</p>
+                <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-700">{roleLabel}</p>
+              </div>
+              <button
+                type="button"
+                className="mt-2 inline-flex w-full items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-left text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+                onClick={() => {
+                  setProfileOpen(false)
+                  onLogout()
+                }}
+                role="menuitem"
+              >
+                <FaSignOutAlt className="h-4 w-4" />
+                Cerrar sesión
+              </button>
+            </div>
+          ) : null}
         </div>
-        <button
-          type="button"
-          className="shrink-0 rounded-lg border border-blue-400/40 bg-blue-800/25 px-3 py-1.5 text-sm font-semibold text-blue-50 transition hover:bg-blue-700/40"
-          onClick={onLogout}
-        >
-          Cerrar sesión
-        </button>
       </header>
 
       {menuOpen ? (
@@ -125,8 +160,10 @@ export function NavigationBar({
         inert={!menuOpen ? true : undefined}
       >
         <div className="flex flex-col items-center gap-2 px-3 pb-4 text-center">
-          <TasksBrandIcon className="h-10 w-10 shrink-0 text-blue-300" />
-          <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">BarberFlow Pro</h2>
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-300/30 bg-blue-500/10 text-blue-300 shadow-[0_10px_30px_-18px_rgba(59,130,246,0.7)]">
+            <FaCut className="h-6 w-6" />
+          </span>
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">BarberShop</h2>
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 px-3" aria-label="Principal">
           {navItems.map((item) => (
@@ -141,7 +178,10 @@ export function NavigationBar({
                 }`
               }
             >
-              {item.label}
+              <span className="inline-flex items-center gap-2.5">
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </span>
             </NavLink>
           ))}
         </nav>

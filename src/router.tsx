@@ -3,6 +3,7 @@ import { AppShell } from './components/AppShell'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { RoleRoute } from './components/RoleRoute'
 import { RootLayout } from './layouts/RootLayout'
+import { ContactPage } from './pages/ContactPage'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
@@ -14,6 +15,7 @@ export const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'register', element: <Register /> },
+      { path: 'contacto', element: <ContactPage /> },
       {
         element: <ProtectedRoute />,
         children: [

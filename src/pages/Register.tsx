@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { showNotification } from '../lib/notifications'
 
 export function Register() {
@@ -169,10 +170,11 @@ export function Register() {
               />
               <button
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-slate-300 px-2 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-slate-300 p-1.5 text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
                 onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showPassword ? 'Ocultar' : 'Mostrar'}
+                  {showPassword ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
               </button>
             </div>
           </label>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { showNotification } from '../lib/notifications'
 
 export function Register() {
   const navigate = useNavigate()
@@ -33,8 +34,20 @@ export function Register() {
           className="mt-5 grid gap-4 sm:grid-cols-2"
           onSubmit={(event) => {
             event.preventDefault()
-            if (!form.nombre || !form.email || !form.password) return
+            if (!form.nombre || !form.email || !form.password) {
+              showNotification({
+                title: 'Registro incompleto',
+                message: 'Completa todos los campos para crear tu cuenta.',
+                variant: 'warning',
+              })
+              return
+            }
             setCreated(true)
+            showNotification({
+              title: 'Cuenta creada',
+              message: 'Tu cuenta de cliente fue creada correctamente.',
+              variant: 'success',
+            })
           }}
         >
           <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600 sm:col-span-2">

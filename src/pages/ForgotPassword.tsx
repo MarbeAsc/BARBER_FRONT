@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { showNotification } from '../lib/notifications'
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -27,8 +28,20 @@ export function ForgotPassword() {
             className="mt-5 space-y-4"
             onSubmit={(event) => {
               event.preventDefault()
-              if (!email.trim()) return
+              if (!email.trim()) {
+                showNotification({
+                  title: 'Correo requerido',
+                  message: 'Ingresa tu correo para recuperar la contraseña.',
+                  variant: 'warning',
+                })
+                return
+              }
               setSubmitted(true)
+              showNotification({
+                title: 'Solicitud enviada',
+                message: 'Si el correo existe, te enviamos el enlace de recuperación.',
+                variant: 'info',
+              })
             }}
           >
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">

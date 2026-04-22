@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { ClienteBookingsTable } from '../../features/tables/cliente/ClienteBookingsTable'
 import { ClienteReservaForm } from '../../features/forms/cliente/ClienteReservaForm'
+import { showNotification } from '../../lib/notifications'
 
 const serviciosDisponibles = [
   { nombre: 'Corte clásico', barberos: ['Luis Herrera', 'Darío Campos'] },
@@ -34,6 +35,11 @@ export function ClienteReservasPage() {
     hora: string
   }) => {
     setRows((prev) => [{ servicio, barbero, fecha, hora, estado: 'Pendiente' as const }, ...prev])
+    showNotification({
+      title: 'Reserva registrada',
+      message: `Tu cita de ${servicio} con ${barbero} fue creada para ${fecha} a las ${hora}.`,
+      variant: 'success',
+    })
   }
 
   return (

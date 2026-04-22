@@ -13,7 +13,7 @@ export function Register() {
   return (
     <main className="grid min-h-svh place-items-center bg-[#f8f8fb] px-4 py-10">
       <section className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700/90">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">
           Crear cuenta
         </p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">

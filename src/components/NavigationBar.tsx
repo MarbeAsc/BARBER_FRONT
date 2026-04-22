@@ -55,7 +55,7 @@ function TasksBrandIcon({ className }: { className?: string }) {
 
 function HamburgerIcon({ open }: { open: boolean }) {
   const bar =
-    'h-0.5 w-6 rounded-full bg-amber-50/95 transition-transform duration-200 ease-out'
+    'h-0.5 w-6 rounded-full bg-blue-50/95 transition-transform duration-200 ease-out'
   return (
     <span className="flex h-5 w-6 flex-col justify-center gap-[5px]" aria-hidden>
       <span className={`${bar} ${open ? 'translate-y-[7px] rotate-45' : ''}`} />
@@ -79,10 +79,10 @@ export function NavigationBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex items-center gap-3 border-b border-amber-500/35 bg-linear-to-r from-[#121216] via-[#15151b] to-[#0f0f14] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_8px_28px_-12px_rgba(0,0,0,0.6)] sm:px-5">
+      <header className="sticky top-0 z-50 flex items-center gap-3 border-b border-blue-500/35 bg-linear-to-r from-[#121216] via-[#15151b] to-[#0f0f14] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_8px_28px_-12px_rgba(0,0,0,0.6)] sm:px-5">
         <button
           type="button"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent text-amber-50 outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-amber-300/50"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent text-blue-50 outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-blue-300/50"
           onClick={onToggleMenu}
           aria-expanded={menuOpen}
           aria-controls={menuId}
@@ -90,17 +90,17 @@ export function NavigationBar({
         >
           <HamburgerIcon open={menuOpen} />
         </button>
-        <span className="text-sm font-semibold tracking-tight text-amber-100/95">
+        <span className="text-sm font-semibold tracking-tight text-blue-100/95">
         BarberShop
         </span>
         <div className="min-w-0 flex-1 text-right text-xs font-bold text-white sm:text-sm">
-          <span className="hidden truncate rounded-full border border-amber-400/35 bg-amber-800/25 p-4 sm:inline">
+          <span className="hidden truncate rounded-full border border-blue-400/35 bg-blue-800/25 p-4 sm:inline">
             {userEmail}
           </span>
         </div>
         <button
           type="button"
-          className="shrink-0 rounded-lg border border-amber-400/40 bg-amber-800/25 px-3 py-1.5 text-sm font-semibold text-amber-50 transition hover:bg-amber-700/40"
+          className="shrink-0 rounded-lg border border-blue-400/40 bg-blue-800/25 px-3 py-1.5 text-sm font-semibold text-blue-50 transition hover:bg-blue-700/40"
           onClick={onLogout}
         >
           Cerrar sesión
@@ -125,7 +125,7 @@ export function NavigationBar({
         inert={!menuOpen ? true : undefined}
       >
         <div className="flex flex-col items-center gap-2 px-3 pb-4 text-center">
-          <TasksBrandIcon className="h-10 w-10 shrink-0 text-amber-300" />
+          <TasksBrandIcon className="h-10 w-10 shrink-0 text-blue-300" />
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">BarberFlow Pro</h2>
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 px-3" aria-label="Principal">
@@ -137,7 +137,7 @@ export function NavigationBar({
               onClick={onCloseMenu}
               className={({ isActive }) =>
                 `rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive ? 'bg-amber-400/20 text-amber-200' : 'text-zinc-200 hover:bg-zinc-800'
+                  isActive ? 'bg-blue-400/20 text-blue-200' : 'text-zinc-200 hover:bg-zinc-800'
                 }`
               }
             >

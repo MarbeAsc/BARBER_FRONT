@@ -166,7 +166,7 @@ export function Login() {
         />
 
         <div className="relative z-10 max-w-lg space-y-5">
-          <span className="inline-flex rounded-full border border-amber-300/35 bg-amber-400/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-amber-200">
+          <span className="inline-flex rounded-full border border-blue-300/35 bg-blue-400/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-blue-200">
             Barber Suite
           </span>
           <h1 className="text-balance text-[1.65rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white sm:text-3xl lg:text-[2.125rem]">
@@ -192,7 +192,7 @@ export function Login() {
               className="flex gap-3.5 text-zinc-200 transition-[opacity,transform] duration-300 ease-out hover:translate-x-0.5 hover:opacity-95"
             >
               <span
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300 shadow-[0_0_0_1px_rgba(253,230,138,0.45)] transition-opacity duration-300"
+                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-300 shadow-[0_0_0_1px_rgba(191,219,254,0.45)] transition-opacity duration-300"
                 aria-hidden
               />
               <span>{label}</span>
@@ -222,7 +222,7 @@ export function Login() {
               Acceso al sistema
             </h2>
             <div
-              className="mx-auto mt-3 h-px w-14 rounded-full bg-linear-to-r from-transparent via-amber-400/80 to-transparent"
+              className="mx-auto mt-3 h-px w-14 rounded-full bg-linear-to-r from-transparent via-blue-400/80 to-transparent"
               aria-hidden
             />
             <p className="mt-4 text-sm leading-relaxed text-slate-500">
@@ -357,7 +357,7 @@ export function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#d97706] via-[#f59e0b] to-[#d97706] px-4 py-3 text-[0.9375rem] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_14px_30px_-16px_rgba(217,119,6,0.58)] transition-[filter,transform,opacity] duration-200 hover:brightness-[1.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-55"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#2563eb] via-[#3b82f6] to-[#2563eb] px-4 py-3 text-[0.9375rem] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.2)_inset,0_14px_30px_-16px_rgba(37,99,235,0.58)] transition-[filter,transform,opacity] duration-200 hover:brightness-[1.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-55"
               >
                 {isSubmitting ? (
                   <>
@@ -376,21 +376,21 @@ export function Login() {
                 <div className="grid gap-2">
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50"
                     onClick={() => loginAsDemoUser(DEMO_USERS.admin)}
                   >
                     {DEMO_USERS.admin.label}
                   </button>
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50"
                     onClick={() => loginAsDemoUser(DEMO_USERS.barbero)}
                   >
                     {DEMO_USERS.barbero.label}
                   </button>
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-amber-300 hover:bg-amber-50"
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50"
                     onClick={() => loginAsDemoUser(DEMO_USERS.cliente)}
                   >
                     {DEMO_USERS.cliente.label}

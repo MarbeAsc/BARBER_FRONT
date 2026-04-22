@@ -21,7 +21,7 @@ function statusBadge(value: unknown) {
   return (
     <span
       className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-        active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+        active ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
       }`}
     >
       {active ? 'Activo' : 'Inactivo'}
@@ -67,9 +67,9 @@ export function AdminCatalogTable<T extends Record<string, unknown>>({
             <p className="text-emerald-700">Activos</p>
             <p className="text-base font-semibold text-emerald-800">{activeCount}</p>
           </article>
-          <article className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2">
-            <p className="text-amber-700">Inactivos</p>
-            <p className="text-base font-semibold text-amber-800">{inactiveCount}</p>
+          <article className="rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2">
+            <p className="text-blue-700">Inactivos</p>
+            <p className="text-base font-semibold text-blue-800">{inactiveCount}</p>
           </article>
         </div>
       </div>

@@ -135,15 +135,15 @@ export function Loader() {
 
   return (
     <div
-      className="fixed inset-0 z-1000 flex flex-col items-center justify-center bg-[#0b0b0e]/92 text-amber-50/95 backdrop-blur-xs"
+      className="fixed inset-0 z-1000 flex flex-col items-center justify-center bg-[#0b0b0e]/92 text-blue-50/95 backdrop-blur-xs"
       role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label={copy.title}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="nav-loader-glow absolute -left-1/4 top-1/3 h-[55%] w-[70%] rounded-full bg-amber-300/15 blur-3xl" />
-        <div className="nav-loader-glow absolute -right-1/4 bottom-1/4 h-[45%] w-[60%] rounded-full bg-amber-400/15 blur-3xl [animation-delay:-1.1s]" />
+        <div className="nav-loader-glow absolute -left-1/4 top-1/3 h-[55%] w-[70%] rounded-full bg-blue-300/15 blur-3xl" />
+        <div className="nav-loader-glow absolute -right-1/4 bottom-1/4 h-[45%] w-[60%] rounded-full bg-blue-400/15 blur-3xl [animation-delay:-1.1s]" />
         <div className="absolute inset-0 bg-linear-to-b from-[#121216]/90 via-zinc-950/88 to-[#0a0a0c]/95" />
       </div>
 
@@ -152,21 +152,21 @@ export function Loader() {
         className="nav-loader-pop relative z-10 flex max-w-[min(340px,90vw)] flex-col items-center gap-7 px-6 text-center"
       >
         <div className="relative flex h-24 w-24 items-center justify-center" aria-hidden>
-          <span className="absolute inset-0 rounded-full border border-amber-400/25 motion-safe:animate-[ping_2.4s_cubic-bezier(0,0,0.2,1)_infinite]" />
-          <span className="absolute inset-2 rounded-full border border-amber-300/20 motion-safe:animate-[ping_2.8s_cubic-bezier(0,0,0.2,1)_infinite] [animation-delay:0.25s]" />
-          <span className="absolute inset-4 rounded-full bg-amber-500/10 blur-md motion-safe:animate-pulse" />
-          <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-amber-400/40 border-t-amber-100 shadow-[0_0_24px_rgba(245,158,11,0.3)] motion-safe:animate-spin">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-100/90 shadow-[0_0_12px_rgba(254,243,199,0.9)]" />
+          <span className="absolute inset-0 rounded-full border border-blue-400/25 motion-safe:animate-[ping_2.4s_cubic-bezier(0,0,0.2,1)_infinite]" />
+          <span className="absolute inset-2 rounded-full border border-blue-300/20 motion-safe:animate-[ping_2.8s_cubic-bezier(0,0,0.2,1)_infinite] [animation-delay:0.25s]" />
+          <span className="absolute inset-4 rounded-full bg-blue-500/10 blur-md motion-safe:animate-pulse" />
+          <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-blue-400/40 border-t-blue-100 shadow-[0_0_24px_rgba(59,130,246,0.3)] motion-safe:animate-spin">
+            <span className="h-2.5 w-2.5 rounded-full bg-blue-100/90 shadow-[0_0_12px_rgba(219,234,254,0.9)]" />
           </div>
         </div>
 
         <div className="space-y-3">
           <p className="text-base font-semibold tracking-tight text-white sm:text-lg">{copy.title}</p>
-          <p className="text-sm leading-relaxed text-amber-100/80 sm:text-[0.9375rem]">{copy.subtitle}</p>
-          <p className="flex items-center justify-center gap-1 pt-1 text-xs font-medium text-amber-200/65">
-            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-amber-200/90" />
-            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-amber-200/90" />
-            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-amber-200/90" />
+          <p className="text-sm leading-relaxed text-blue-100/80 sm:text-[0.9375rem]">{copy.subtitle}</p>
+          <p className="flex items-center justify-center gap-1 pt-1 text-xs font-medium text-blue-200/65">
+            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-blue-200/90" />
+            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-blue-200/90" />
+            <span className="nav-loader-dot inline-block h-1 w-1 rounded-full bg-blue-200/90" />
           </p>
         </div>
       </div>

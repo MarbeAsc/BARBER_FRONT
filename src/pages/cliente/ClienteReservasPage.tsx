@@ -38,8 +38,8 @@ export function ClienteReservasPage() {
 
   return (
     <main className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <header className="mb-6 rounded-2xl border border-amber-100 bg-linear-to-r from-amber-50/70 to-white px-6 py-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700/90">Cliente</p>
+      <header className="mb-6 rounded-2xl border border-blue-100 bg-linear-to-r from-blue-50/70 to-white px-6 py-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Cliente</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Mis citas y reservas</h1>
         <p className="mt-2 text-sm text-slate-500">
           Hola, {user?.name}. Elige un servicio, revisa los barberos disponibles y agenda fecha/hora para tu cita.

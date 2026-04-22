@@ -13,7 +13,7 @@ type ClienteBookingsTableProps = {
 function badgeClass(status: BookingRow['estado']) {
   if (status === 'Confirmada') return 'bg-emerald-100 text-emerald-700'
   if (status === 'Reprogramada') return 'bg-blue-100 text-blue-700'
-  return 'bg-amber-100 text-amber-700'
+  return 'bg-blue-100 text-blue-700'
 }
 
 export function ClienteBookingsTable({ rows }: ClienteBookingsTableProps) {

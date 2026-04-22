@@ -1,6 +1,8 @@
 import { useAuth } from '../context/AuthContext'
 import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { inferRoleFromEmail, roleLabel, type UserRole } from '../lib/roles'
+import { showNotification } from '../lib/notifications'
 
 type Kpi = {
   label: string
@@ -19,7 +21,86 @@ type Appointment = {
 
 export function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const selectedRole = useMemo(() => inferRoleFromEmail(user?.email), [user?.email])
+
+  const quickActionsByRole: Record<
+    UserRole,
+    Array<{ label: string; className: string; onClick: () => void }>
+  > = {
+    admin: [
+      {
+        label: 'Gestionar servicios',
+        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        onClick: () => navigate('/servicios'),
+      },
+      {
+        label: 'Asignar barbero',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () => navigate('/barberos'),
+      },
+      {
+        label: 'Administrar perfumes y extras',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () => navigate('/perfumes'),
+      },
+    ],
+    barbero: [
+      {
+        label: 'Iniciar siguiente cita',
+        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        onClick: () => navigate('/mis-citas'),
+      },
+      {
+        label: 'Ver servicios asignados',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () =>
+          showNotification({
+            title: 'Módulo en preparación',
+            message: 'La vista de servicios asignados estará disponible pronto.',
+            variant: 'info',
+          }),
+      },
+      {
+        label: 'Historial del día',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () =>
+          showNotification({
+            title: 'Módulo en preparación',
+            message: 'El historial detallado del día estará disponible pronto.',
+            variant: 'info',
+          }),
+      },
+    ],
+    cliente: [
+      {
+        label: 'Reservar cita',
+        className: 'w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800',
+        onClick: () => navigate('/mis-reservas'),
+      },
+      {
+        label: 'Ver barberos disponibles',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () => navigate('/mis-reservas'),
+      },
+      {
+        label: 'Reprogramar cita',
+        className:
+          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900',
+        onClick: () =>
+          showNotification({
+            title: 'Acción pendiente',
+            message: 'La reprogramación estará disponible en el próximo módulo.',
+            variant: 'warning',
+          }),
+      },
+    ],
+  }
 
   const kpisByRole: Record<UserRole, Kpi[]> = {
     admin: [
@@ -134,6 +215,35 @@ export function Dashboard() {
   return (
     <div className="w-full min-w-0 bg-white">
       <main className="mx-auto px-4 py-8 text-slate-700 sm:px-6 lg:px-8 lg:py-10">
+        <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="group relative">
+            <img
+              src="/logo+.jpg"
+              alt="Barbería en acción"
+              className="h-56 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] sm:h-72 lg:h-80"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-900/45 via-slate-900/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+              <p className="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                Estado del sistema
+              </p>
+              <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+                {selectedRole === 'admin' && 'Control central de operación'}
+                {selectedRole === 'barbero' && 'Agenda operativa del barbero'}
+                {selectedRole === 'cliente' && 'Gestión de reservas del cliente'}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-blue-100/95">
+                {selectedRole === 'admin' &&
+                  'Monitorea servicios, usuarios y desempeño diario desde un único panel de administración.'}
+                {selectedRole === 'barbero' &&
+                  'Revisa tus citas asignadas, controla tu disponibilidad y da seguimiento al estado de atención.'}
+                {selectedRole === 'cliente' &&
+                  'Consulta servicios disponibles, selecciona barbero y agenda fecha/hora para tu próxima cita.'}
+              </p>
+            </div>
+          </div>
+        </section>
+
         <div className="mb-8 rounded-2xl border border-blue-100 bg-linear-to-r from-blue-50/70 to-white px-6 py-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">
             Resumen del día
@@ -254,30 +364,16 @@ export function Dashboard() {
                 Acciones rapidas
               </h3>
               <div className="mt-3 space-y-2">
-                <button
-                  type="button"
-                  className="w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                >
-                  {selectedRole === 'admin' && 'Gestionar servicios'}
-                  {selectedRole === 'barbero' && 'Iniciar siguiente cita'}
-                  {selectedRole === 'cliente' && 'Reservar cita'}
-                </button>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900"
-                >
-                  {selectedRole === 'admin' && 'Asignar barbero'}
-                  {selectedRole === 'barbero' && 'Ver servicios asignados'}
-                  {selectedRole === 'cliente' && 'Ver barberos disponibles'}
-                </button>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-slate-900"
-                >
-                  {selectedRole === 'admin' && 'Administrar perfumes y extras'}
-                  {selectedRole === 'barbero' && 'Historial del día'}
-                  {selectedRole === 'cliente' && 'Reprogramar cita'}
-                </button>
+                {quickActionsByRole[selectedRole].map((action) => (
+                  <button
+                    key={action.label}
+                    type="button"
+                    className={action.className}
+                    onClick={action.onClick}
+                  >
+                    {action.label}
+                  </button>
+                ))}
               </div>
             </section>
           </aside>

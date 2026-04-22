@@ -216,7 +216,7 @@ export function Login() {
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto w-full max-w-[400px]">
+        <div className="relative z-10 mx-auto w-full max-w-[430px]">
           <div className="mb-9 text-center">
             <h2 className="text-[1.08rem] font-semibold tracking-[-0.01em] text-slate-900">
               Acceso al sistema
@@ -230,7 +230,12 @@ export function Login() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_0_rgba(255,255,255,0.95)_inset,0_18px_48px_-34px_rgba(15,23,42,0.22)] sm:p-8">
+          <div className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-[0_20px_50px_-30px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-8">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="h-2 w-2 rounded-full bg-blue-400" />
+              <span className="h-2 w-2 rounded-full bg-slate-300" />
+            </div>
             <form
               className="space-y-5"
               onSubmit={(e) => {
@@ -256,7 +261,7 @@ export function Login() {
                   autoFocus
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                  className={`w-full rounded-xl border px-3.5 py-2.5 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-400/70 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.16)] ${
+                  className={`w-full rounded-xl border px-3.5 py-2.5 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 ${
                     emailError
                       ? "border-rose-400/80 bg-rose-950/20 focus:border-rose-400 focus:shadow-[0_0_0_3px_rgba(251,113,133,0.18)]"
                       : "border-slate-200 bg-slate-50/30 hover:border-slate-300"
@@ -296,7 +301,7 @@ export function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                    className={`w-full rounded-xl border px-3.5 py-2.5 pr-12 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-400/70 focus:bg-white focus:shadow-[0_0_0_3px_rgba(59,130,246,0.16)] ${
+                    className={`w-full rounded-xl border px-3.5 py-2.5 pr-12 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 ${
                       passwordError
                         ? "border-rose-400/80 bg-rose-950/20 focus:border-rose-400 focus:shadow-[0_0_0_3px_rgba(251,113,133,0.18)]"
                         : "border-slate-200 bg-slate-50/30 hover:border-slate-300"

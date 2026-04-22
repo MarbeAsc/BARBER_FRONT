@@ -8,6 +8,7 @@ import {
   FaCut,
   FaHome,
   FaPlusCircle,
+  FaSearch,
   FaSignOutAlt,
   FaSprayCan,
   FaUserCircle,
@@ -64,6 +65,7 @@ export function NavigationBar({
   const role = inferRoleFromEmail(userEmail)
   const navItems = navItemsByRole[role]
   const [profileOpen, setProfileOpen] = useState(false)
+  const [search, setSearch] = useState('')
   const profileRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -86,6 +88,9 @@ export function NavigationBar({
   }, [profileOpen])
 
   const roleLabel = role === 'admin' ? 'Administrador' : role === 'barbero' ? 'Barbero' : 'Cliente'
+  const filteredNavItems = navItems.filter((item) =>
+    item.label.toLowerCase().includes(search.trim().toLowerCase()),
+  )
 
   return (
     <>
@@ -165,8 +170,20 @@ export function NavigationBar({
           </span>
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-100">BarberShop</h2>
         </div>
+        <div className="px-3 pb-3">
+          <label className="relative block" aria-label="Buscar en la aplicación">
+            <FaSearch className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar opción..."
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-900/90 py-2 pl-9 pr-3 text-sm text-zinc-100 outline-none transition focus:border-blue-400/60 focus:ring-2 focus:ring-blue-500/20"
+            />
+          </label>
+        </div>
         <nav className="flex flex-1 flex-col gap-0.5 px-3" aria-label="Principal">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -184,6 +201,11 @@ export function NavigationBar({
               </span>
             </NavLink>
           ))}
+          {filteredNavItems.length === 0 ? (
+            <p className="rounded-lg border border-zinc-800 bg-zinc-900/70 px-3 py-2 text-xs text-zinc-400">
+              No se encontraron opciones para "{search}".
+            </p>
+          ) : null}
         </nav>
         <p className="mt-auto border-t border-white/10 px-4 pt-4 text-xs text-zinc-400">
           Conectado como <span className="font-medium text-zinc-200">{userName}</span>

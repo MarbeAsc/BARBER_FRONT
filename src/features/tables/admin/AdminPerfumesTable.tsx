@@ -1,5 +1,5 @@
 import { showNotification } from '../../../lib/notifications'
-import { FaPen, FaPlus, FaTrashAlt } from 'react-icons/fa'
+import { FaPen, FaTrashAlt } from 'react-icons/fa'
 import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { CustomButton } from '../../../components/Button'
 
@@ -64,20 +64,9 @@ export function AdminPerfumesTable() {
     paginationDisplayMode: 'pages',
     displayColumnDefOptions: { 'mrt-row-actions': { header: 'Acciones', size: 140 } },
     renderTopToolbarCustomActions: () => (
-      <div className="flex flex-wrap items-center gap-2">
-        <CustomButton
-          type="button"
-          variant="primary"
-          leftIcon={<FaPlus className="h-3.5 w-3.5" />}
-          tooltip="Agregar perfume"
-          className="rounded-xl"
-          onClick={() =>
-            showNotification({ title: 'Perfumes', message: 'Abrir formulario para agregar perfume.', variant: 'info' })
-          }
-        >
-          Agregar perfume
-        </CustomButton>
-      </div>
+      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+        Tip: usa filtros para encontrar
+      </span>
     ),
     renderRowActions: ({ row }) => (
       <div className="inline-flex gap-2">
@@ -124,10 +113,21 @@ export function AdminPerfumesTable() {
       <div className="border-b border-slate-200 bg-linear-to-br from-slate-50 to-white px-5 py-4">
         <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">Perfumes registrados</h2>
         <p className="mt-1 text-xs text-slate-500 sm:text-sm">Inventario de perfumes por marca, aroma y disponibilidad.</p>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-xs sm:max-w-md">
-          <article className="rounded-lg border border-slate-200 bg-white px-3 py-2"><p className="text-slate-500">Total</p><p className="text-base font-semibold text-slate-900">{perfumeRows.length}</p></article>
-          <article className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2"><p className="text-emerald-700">Activos</p><p className="text-base font-semibold text-emerald-800">{activeCount}</p></article>
-          <article className="rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2"><p className="text-blue-700">Inactivos</p><p className="text-base font-semibold text-blue-800">{inactiveCount}</p></article>
+        <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+          <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
+            <span className="text-slate-500">Resumen del inventario</span>
+            <span className="text-slate-700">{perfumeRows.length} registros</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-emerald-500"
+              style={{ width: `${perfumeRows.length ? (activeCount / perfumeRows.length) * 100 : 0}%` }}
+            />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">Activos: {activeCount}</span>
+            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-blue-700">Inactivos: {inactiveCount}</span>
+          </div>
         </div>
       </div>
       <div className="p-4">

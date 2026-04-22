@@ -1,12 +1,12 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { CustomButton } from '../../../components/Button'
 
-type ServicioOption = {
+export type ServicioOption = {
   nombre: string
   barberos: string[]
 }
 
-type ClienteReservaFormValues = {
+export type ClienteReservaFormValues = {
   servicio: string
   barbero: string
   fecha: string

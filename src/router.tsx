@@ -60,13 +60,6 @@ export const router = createBrowserRouter([
                       return { Component: AdminBarberosPage }
                     },
                   },
-                  {
-                    path: 'usuarios',
-                    lazy: async () => {
-                      const { AdminUsuariosPage } = await import('./pages/admin/AdminUsuariosPage')
-                      return { Component: AdminUsuariosPage }
-                    },
-                  },
                 ],
               },
               {

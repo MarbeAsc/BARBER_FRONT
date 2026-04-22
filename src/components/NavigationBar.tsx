@@ -13,7 +13,6 @@ import {
   FaSprayCan,
   FaUserCircle,
   FaUserTie,
-  FaUsers,
   FaTimes,
 } from 'react-icons/fa'
 import { inferRoleFromEmail, type UserRole } from '../lib/roles'
@@ -41,7 +40,6 @@ const navItemsByRole: Record<UserRole, NavItem[]> = {
     { to: '/anadidos', label: 'Añadidos', icon: FaPlusCircle },
     { to: '/perfumes', label: 'Perfumes', icon: FaSprayCan },
     { to: '/barberos', label: 'Barberos', icon: FaUserTie },
-    { to: '/usuarios', label: 'Usuarios', icon: FaUsers },
   ],
   barbero: [
     { to: '/', label: 'Panel general', icon: FaHome },

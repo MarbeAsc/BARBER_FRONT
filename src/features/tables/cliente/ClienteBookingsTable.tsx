@@ -69,7 +69,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
     },
     renderTopToolbarCustomActions: () => (
       <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
-        Tip: revisa estado y fecha antes de editar
+        Tip: usa filtros para encontrar
       </span>
     ),
     renderRowActions: ({ row }) => (
@@ -171,19 +171,25 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
         <p className="mt-1 text-sm text-slate-500">
           Consulta y da seguimiento a tus citas agendadas.
         </p>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-xs sm:max-w-md">
-          <article className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-            <p className="text-slate-500">Total</p>
-            <p className="text-base font-semibold text-slate-900">{rows.length}</p>
-          </article>
-          <article className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
-            <p className="text-emerald-700">Confirmadas</p>
-            <p className="text-base font-semibold text-emerald-800">{confirmedCount}</p>
-          </article>
-          <article className="rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2">
-            <p className="text-blue-700">Pendientes/Reprogramadas</p>
-            <p className="text-base font-semibold text-blue-800">{pendingCount + rescheduledCount}</p>
-          </article>
+        <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+          <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
+            <span className="text-slate-500">Resumen de reservas</span>
+            <span className="text-slate-700">{rows.length} citas</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-emerald-500"
+              style={{ width: `${rows.length ? (confirmedCount / rows.length) * 100 : 0}%` }}
+            />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
+              Confirmadas: {confirmedCount}
+            </span>
+            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-blue-700">
+              Pendientes/Reprogramadas: {pendingCount + rescheduledCount}
+            </span>
+          </div>
         </div>
       </div>
       <div className="p-4">

@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { FaCalendarPlus } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
+import { CustomButton } from '../../components/Button'
 import { ClienteBookingsTable } from '../../features/tables/cliente/ClienteBookingsTable'
-import { ClienteReservaForm } from '../../features/forms/cliente/ClienteReservaForm'
+import { ClienteReservaModal } from '../../features/modals/cliente/ClienteReservaModal'
 import { showNotification } from '../../lib/notifications'
 
 const serviciosDisponibles = [
@@ -22,6 +24,7 @@ const initialRows = [
 export function ClienteReservasPage() {
   const { user } = useAuth()
   const [rows, setRows] = useState(initialRows)
+  const [reservaModalOpen, setReservaModalOpen] = useState(false)
 
   const handleReservar = ({
     servicio,
@@ -52,7 +55,30 @@ export function ClienteReservasPage() {
         </p>
       </header>
 
-      <ClienteReservaForm
+      <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Agenda una nueva cita</p>
+            <p className="text-xs text-slate-500">
+              Abre el modal interactivo para elegir servicio, barbero, fecha y hora.
+            </p>
+          </div>
+          <CustomButton
+            type="button"
+            variant="primary"
+            tooltip="Agregar reserva"
+            leftIcon={<FaCalendarPlus className="h-3.5 w-3.5" />}
+            className="rounded-xl border border-blue-500 shadow-[0_10px_24px_-16px_rgba(37,99,235,0.85)]"
+            onClick={() => setReservaModalOpen(true)}
+          >
+            Nueva reserva
+          </CustomButton>
+        </div>
+      </section>
+
+      <ClienteReservaModal
+        open={reservaModalOpen}
+        onClose={() => setReservaModalOpen(false)}
         servicios={serviciosDisponibles}
         horasDisponibles={horasDisponibles}
         onReservar={handleReservar}

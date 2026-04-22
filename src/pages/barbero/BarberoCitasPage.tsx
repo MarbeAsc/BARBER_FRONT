@@ -1,4 +1,8 @@
+import { useState } from 'react'
+import { FaClock } from 'react-icons/fa'
+import { CustomButton } from '../../components/Button'
 import { useAuth } from '../../context/AuthContext'
+import { BarberoBloqueoModal } from '../../features/modals/barbero/BarberoBloqueoModal'
 import { BarberoAppointmentsTable } from '../../features/tables/barbero/BarberoAppointmentsTable'
 import { showNotification } from '../../lib/notifications'
 
@@ -11,6 +15,7 @@ const rows = [
 
 export function BarberoCitasPage() {
   const { user } = useAuth()
+  const [bloqueoModalOpen, setBloqueoModalOpen] = useState(false)
 
   return (
     <main className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -22,7 +27,39 @@ export function BarberoCitasPage() {
         </p>
       </header>
 
-     
+      <section className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Gestion de disponibilidad</p>
+            <p className="text-xs text-slate-500">
+              Registra bloqueos de horario para evitar reservas en franjas ocupadas.
+            </p>
+          </div>
+          <CustomButton
+            type="button"
+            variant="primary"
+            tooltip="Agregar bloqueo"
+            leftIcon={<FaClock className="h-3.5 w-3.5" />}
+            className="rounded-xl border border-blue-500 shadow-[0_10px_24px_-16px_rgba(37,99,235,0.85)]"
+            onClick={() => setBloqueoModalOpen(true)}
+          >
+            Bloquear horario
+          </CustomButton>
+        </div>
+      </section>
+
+      <BarberoBloqueoModal
+        open={bloqueoModalOpen}
+        onClose={() => setBloqueoModalOpen(false)}
+        onSave={({ fecha, hora, motivo }) =>
+          showNotification({
+            title: 'Horario bloqueado',
+            message: `Se registro bloqueo para ${fecha} ${hora}. Motivo: ${motivo}.`,
+            variant: 'success',
+          })
+        }
+      />
+
       <BarberoAppointmentsTable
         rows={rows}
         onEdit={(row) =>

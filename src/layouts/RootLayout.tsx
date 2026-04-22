@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { NavigationLoadingOverlay } from '../components/NavigationLoadingOverlay'
+import { Loader } from '../components/Loader'
 
 function QueryDevtoolsWhenNotLogin() {
   const { pathname } = useLocation()
@@ -17,7 +17,7 @@ function QueryDevtoolsWhenNotLogin() {
 export function RootLayout() {
   return (
     <>
-      <NavigationLoadingOverlay />
+      <Loader />
       <Outlet />
       <QueryDevtoolsWhenNotLogin />
     </>

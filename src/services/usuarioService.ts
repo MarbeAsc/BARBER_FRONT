@@ -1,10 +1,9 @@
 import axios from "axios";
 import { apiSSO } from "../lib/api-client";
 
-export class RespuestaAutenticacionDTO
-{
-    Estatus: boolean;
-    Token: string;
+export interface RespuestaAutenticacionDTO {
+  Estatus: boolean
+  Token: string
 }
 export interface RespuestaDTO
 {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FaCalendarPlus } from 'react-icons/fa'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { CustomButton } from '../../components/Button'
 import { ClienteBookingsTable } from '../../features/tables/cliente/ClienteBookingsTable'
 import { ClienteReservaModal } from '../../features/modals/cliente/ClienteReservaModal'
@@ -51,7 +51,7 @@ export function ClienteReservasPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Cliente</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Mis citas y reservas</h1>
         <p className="mt-2 text-sm text-slate-500">
-          Hola, {user?.name}. Elige un servicio, revisa los barberos disponibles y agenda fecha/hora para tu cita.
+          Hola, {user?.username}. Elige un servicio, revisa los barberos disponibles y agenda fecha/hora para tu cita.
         </p>
       </header>
 

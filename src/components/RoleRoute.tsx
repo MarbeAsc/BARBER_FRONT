@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { inferRoleFromEmail, type UserRole } from '../lib/roles'
 
 type RoleRouteProps = {

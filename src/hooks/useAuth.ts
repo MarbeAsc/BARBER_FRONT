@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { useAuthStore, type AuthUser } from '../lib/auth-store'
 import { showNotification } from '../lib/notifications'
 import { decodeJwtPayload, isValidJwtToken } from '../lib/jwt'

@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CustomButton } from '../components/Button'

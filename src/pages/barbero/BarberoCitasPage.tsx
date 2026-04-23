@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FaClock } from 'react-icons/fa'
 import { CustomButton } from '../../components/Button'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { BarberoBloqueoModal } from '../../features/modals/barbero/BarberoBloqueoModal'
 import { BarberoAppointmentsTable } from '../../features/tables/barbero/BarberoAppointmentsTable'
 import { showNotification } from '../../lib/notifications'
@@ -23,7 +23,7 @@ export function BarberoCitasPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Barbero</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Mi agenda del día</h1>
         <p className="mt-2 text-sm text-slate-500">
-          Bienvenido, {user?.name}. Aquí ves únicamente tus citas programadas.
+          Bienvenido, {user?.username}. Aquí ves únicamente tus citas programadas.
         </p>
       </header>
 

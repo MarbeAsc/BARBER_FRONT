@@ -155,7 +155,11 @@ export function ForgotPassword() {
           <Link to="/login" className="font-semibold text-blue-700 hover:text-blue-800">
             Volver a iniciar sesión
           </Link>
-          <Link to="/register" className="font-semibold text-blue-700 hover:text-blue-800">
+          <Link
+            to="/register"
+            state={{ allowPublicFlow: true }}
+            className="font-semibold text-blue-700 hover:text-blue-800"
+          >
             Crear cuenta
           </Link>
         </div>

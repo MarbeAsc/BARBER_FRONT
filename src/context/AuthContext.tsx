@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from 'react'
+import { createContext, useMemo, type ReactNode } from 'react'
 import { useAuthStore, type AuthUser } from '../lib/auth-store'
 
 type AuthContextValue = {
@@ -17,7 +12,7 @@ type AuthContextValue = {
   logout: () => void
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+export const AuthContext = createContext<AuthContextValue | null>(null)
 
 type AuthProviderProps = {
   children: ReactNode
@@ -41,14 +36,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-// Hook co-ubicado con el provider para mantener el módulo simple.
-// eslint-disable-next-line react-refresh/only-export-components
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider')
-  }
-  return ctx
 }

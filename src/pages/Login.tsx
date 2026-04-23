@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { z } from "zod";
 import { CustomButton } from "../components/Button";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/hooks/useAuthContext";
 import { useLogin } from "../hooks/useAuth";
 import { useAuthStore } from "../lib/auth-store";
 
@@ -295,7 +295,7 @@ export function Login() {
                   variant="link"
                   size="sm"
                   className="p-0 text-right"
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate('/forgot-password', { state: { allowPublicFlow: true } })}
                 >
                   ¿Olvidaste tu contraseña?
                 </CustomButton>
@@ -327,7 +327,7 @@ export function Login() {
                   variant="link"
                   size="sm"
                   className="p-0 text-right"
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate('/register', { state: { allowPublicFlow: true } })}
                 >
                   Registrarse
                 </CustomButton>
@@ -342,7 +342,7 @@ export function Login() {
               variant="link"
               size="sm"
               className="p-0 font-semibold underline decoration-blue-300"
-              onClick={() => navigate('/contacto')}
+              onClick={() => navigate('/contacto', { state: { allowPublicFlow: true } })}
             >
               contáctanos
             </CustomButton>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import type { CSSProperties } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/hooks/useAuthContext'
 import { NavigationBar } from './NavigationBar'
 
 const shellSurfaceStyle = {

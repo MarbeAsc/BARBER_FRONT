@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import { RouterProvider } from 'react-router-dom'
-import { AuthProvider } from '../context/AuthContext'
+import { AuthProvider } from '@/context/AuthContext'
 import { NotificationsProvider } from '../context/NotificationsContext'
 import { router } from '../router'
 

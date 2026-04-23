@@ -200,7 +200,7 @@ export function Register() {
             variant="link"
             size="sm"
             className="p-0"
-            onClick={() => navigate('/forgot-password')}
+            onClick={() => navigate('/forgot-password', { state: { allowPublicFlow: true } })}
           >
             Recuperar contraseña
           </CustomButton>

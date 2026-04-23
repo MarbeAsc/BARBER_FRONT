@@ -1,13 +1,22 @@
 import { useState } from 'react'
 import { FaPlusCircle } from 'react-icons/fa'
 import { CustomButton } from '../../components/Button'
-import { AdminQuickActionModal } from '../../features/modals/admin/AdminQuickActionModal'
+import { FormularioBarberoModal } from '../../features/forms/admin/FormularioBarberoModal'
 import { AdminBarberosTable } from '../../features/tables/admin/AdminBarberosTable'
-import { showNotification } from '../../lib/notifications'
 import { AdminSectionFrame } from './AdminSectionFrame'
+import type { BarberoListadoDTO } from '@/services/barberosService'
+
+type BarberoModalState = {
+  open: boolean
+  modoEdicion: boolean
+  barbero: BarberoListadoDTO | null
+}
+
+const barberoModalClosed: BarberoModalState = { open: false, modoEdicion: false, barbero: null }
 
 export function AdminBarberosPage() {
-  const [adminModalOpen, setAdminModalOpen] = useState(false)
+  const [barberoModal, setBarberoModal] = useState<BarberoModalState>(barberoModalClosed)
+  const [formModalKey, setFormModalKey] = useState(0)
 
   return (
     <AdminSectionFrame
@@ -27,27 +36,31 @@ export function AdminBarberosPage() {
             tooltip="Agregar barbero"
             leftIcon={<FaPlusCircle className="h-3.5 w-3.5" />}
             className="rounded-xl border border-blue-500 shadow-[0_10px_24px_-16px_rgba(37,99,235,0.85)]"
-            onClick={() => setAdminModalOpen(true)}
+            onClick={() => {
+              setBarberoModal({ open: true, modoEdicion: false, barbero: null })
+              setFormModalKey((k) => k + 1)
+            }}
           >
             Nuevo barbero
           </CustomButton>
         </div>
       </section>
 
-      <AdminQuickActionModal
-        open={adminModalOpen}
-        entity="barbero"
-        onClose={() => setAdminModalOpen(false)}
-        onConfirm={(value) =>
-          showNotification({
-            title: 'Barbero creado',
-            message: `Se registro "${value}" desde el modal.`,
-            variant: 'success',
-          })
-        }
-      />
+      {barberoModal.open ? (
+        <FormularioBarberoModal
+          key={formModalKey}
+          modoEdicion={barberoModal.modoEdicion}
+          barbero={barberoModal.barbero}
+          onClose={() => setBarberoModal(barberoModalClosed)}
+        />
+      ) : null}
 
-      <AdminBarberosTable />
+      <AdminBarberosTable
+        onEditBarbero={(row) => {
+          setBarberoModal({ open: true, modoEdicion: true, barbero: row })
+          setFormModalKey((k) => k + 1)
+        }}
+      />
     </AdminSectionFrame>
   )
 }

@@ -1,13 +1,22 @@
 import { useState } from 'react'
 import { FaPlusCircle } from 'react-icons/fa'
 import { CustomButton } from '../../components/Button'
-import { AdminQuickActionModal } from '../../features/modals/admin/AdminQuickActionModal'
+import { FormularioPerfumeModal } from '../../features/forms/admin/FormularioPerfumeModal'
 import { AdminPerfumesTable } from '../../features/tables/admin/AdminPerfumesTable'
-import { showNotification } from '../../lib/notifications'
 import { AdminSectionFrame } from './AdminSectionFrame'
+import type { PerfumeDTO } from '@/services/perfumesService'
+
+type PerfumeModalState = {
+  open: boolean
+  modoEdicion: boolean
+  perfume: PerfumeDTO | null
+}
+
+const perfumeModalClosed: PerfumeModalState = { open: false, modoEdicion: false, perfume: null }
 
 export function AdminPerfumesPage() {
-  const [adminModalOpen, setAdminModalOpen] = useState(false)
+  const [perfumeModal, setPerfumeModal] = useState<PerfumeModalState>(perfumeModalClosed)
+  const [formModalKey, setFormModalKey] = useState(0)
 
   return (
     <AdminSectionFrame
@@ -27,27 +36,31 @@ export function AdminPerfumesPage() {
             tooltip="Agregar perfume"
             leftIcon={<FaPlusCircle className="h-3.5 w-3.5" />}
             className="rounded-xl border border-blue-500 shadow-[0_10px_24px_-16px_rgba(37,99,235,0.85)]"
-            onClick={() => setAdminModalOpen(true)}
+            onClick={() => {
+              setPerfumeModal({ open: true, modoEdicion: false, perfume: null })
+              setFormModalKey((k) => k + 1)
+            }}
           >
             Nuevo perfume
           </CustomButton>
         </div>
       </section>
 
-      <AdminQuickActionModal
-        open={adminModalOpen}
-        entity="perfume"
-        onClose={() => setAdminModalOpen(false)}
-        onConfirm={(value) =>
-          showNotification({
-            title: 'Perfume creado',
-            message: `Se registro "${value}" desde el modal.`,
-            variant: 'success',
-          })
-        }
-      />
+      {perfumeModal.open ? (
+        <FormularioPerfumeModal
+          key={formModalKey}
+          modoEdicion={perfumeModal.modoEdicion}
+          perfume={perfumeModal.perfume}
+          onClose={() => setPerfumeModal(perfumeModalClosed)}
+        />
+      ) : null}
 
-      <AdminPerfumesTable />
+      <AdminPerfumesTable
+        onEditPerfume={(row) => {
+          setPerfumeModal({ open: true, modoEdicion: true, perfume: row })
+          setFormModalKey((k) => k + 1)
+        }}
+      />
     </AdminSectionFrame>
   )
 }

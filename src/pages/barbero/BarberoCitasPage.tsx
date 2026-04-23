@@ -6,11 +6,14 @@ import { BarberoBloqueoModal } from '../../features/modals/barbero/BarberoBloque
 import { BarberoAppointmentsTable } from '../../features/tables/barbero/BarberoAppointmentsTable'
 import { showNotification } from '../../lib/notifications'
 
-const rows = [
-  { hora: '09:30', cliente: 'Carlos Mendoza', servicio: 'Corte clásico', duracion: '30 min', estado: 'Finalizada' as const },
-  { hora: '10:15', cliente: 'Miguel Torres', servicio: 'Skin fade', duracion: '45 min', estado: 'En curso' as const },
-  { hora: '11:30', cliente: 'Andrés Rivas', servicio: 'Arreglo de barba', duracion: '25 min', estado: 'Confirmada' as const },
-  { hora: '13:00', cliente: 'Javier Ochoa', servicio: 'Corte + barba', duracion: '60 min', estado: 'Pendiente' as const },
+const demoCitas = [
+  {
+    hora: '10:00',
+    cliente: 'Cliente demo',
+    servicio: 'Corte + barba',
+    duracion: '45 min',
+    estado: 'Confirmada' as const,
+  },
 ]
 
 export function BarberoCitasPage() {
@@ -61,18 +64,18 @@ export function BarberoCitasPage() {
       />
 
       <BarberoAppointmentsTable
-        rows={rows}
+        rows={demoCitas}
         onEdit={(row) =>
           showNotification({
             title: 'Citas',
-            message: `Editar cita de ${row.cliente} (${row.hora}).`,
+            message: `Editar cita ${row.hora} — ${row.cliente} (${row.servicio}).`,
             variant: 'warning',
           })
         }
         onDelete={(row) =>
           showNotification({
             title: 'Citas',
-            message: `Eliminar cita de ${row.cliente} (${row.hora}).`,
+            message: `Eliminar cita ${row.hora} — ${row.cliente} (${row.servicio}).`,
             variant: 'error',
           })
         }

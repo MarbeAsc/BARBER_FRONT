@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
+import { PublicFlowRoute } from './components/PublicFlowRoute'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { RoleRoute } from './components/RoleRoute'
 import { RootLayout } from './layouts/RootLayout'
@@ -7,15 +8,22 @@ import { ContactPage } from './pages/ContactPage'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
+import { RouteErrorPage } from './pages/RouteErrorPage'
 
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: 'login', element: <Login /> },
-      { path: 'forgot-password', element: <ForgotPassword /> },
-      { path: 'register', element: <Register /> },
-      { path: 'contacto', element: <ContactPage /> },
+      {
+        element: <PublicFlowRoute />,
+        children: [
+          { path: 'forgot-password', element: <ForgotPassword /> },
+          { path: 'register', element: <Register /> },
+          { path: 'contacto', element: <ContactPage /> },
+        ],
+      },
       {
         element: <ProtectedRoute />,
         children: [
@@ -30,7 +38,7 @@ export const router = createBrowserRouter([
                 },
               },
               {
-                element: <RoleRoute allow={['admin']} />,
+                element: <RoleRoute allow={['Administrador']} />,
                 children: [
                   {
                     path: 'servicios',
@@ -54,7 +62,7 @@ export const router = createBrowserRouter([
                     },
                   },
                   {
-                    path: 'barberos',
+                    path: 'Barberos',
                     lazy: async () => {
                       const { AdminBarberosPage } = await import('./pages/admin/AdminBarberosPage')
                       return { Component: AdminBarberosPage }
@@ -63,7 +71,7 @@ export const router = createBrowserRouter([
                 ],
               },
               {
-                element: <RoleRoute allow={['barbero']} />,
+                element: <RoleRoute allow={['Barbero']} />,
                 children: [
                   {
                     path: 'mis-citas',
@@ -75,7 +83,7 @@ export const router = createBrowserRouter([
                 ],
               },
               {
-                element: <RoleRoute allow={['cliente']} />,
+                element: <RoleRoute allow={['Cliente']} />,
                 children: [
                   {
                     path: 'mis-reservas',

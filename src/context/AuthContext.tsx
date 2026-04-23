@@ -1,84 +1,43 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useMemo,
-  useState,
   type ReactNode,
 } from 'react'
-
-const SESSION_KEY = 'taskmgmt_session'
-const PERSIST_KEY = 'taskmgmt_session_persist'
-
-export type AuthUser = {
-  email: string
-  name: string
-}
+import { useAuthStore, type AuthUser } from '../lib/auth-store'
 
 type AuthContextValue = {
+  username: AuthUser | null
   user: AuthUser | null
+  token: string | null
   isAuthenticated: boolean
-  login: (user: AuthUser, options?: { remember?: boolean }) => void
+  isLoading: boolean
+  error: string | null
+  login: (session: { username: AuthUser; token?: string | null }) => void
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
-
-function readStoredUser(): AuthUser | null {
-  try {
-    const raw = localStorage.getItem(PERSIST_KEY) ?? sessionStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as unknown
-    if (
-      parsed &&
-      typeof parsed === 'object' &&
-      'email' in parsed &&
-      'name' in parsed &&
-      typeof (parsed as AuthUser).email === 'string' &&
-      typeof (parsed as AuthUser).name === 'string'
-    ) {
-      return { email: (parsed as AuthUser).email, name: (parsed as AuthUser).name }
-    }
-    return null
-  } catch {
-    return null
-  }
-}
 
 type AuthProviderProps = {
   children: ReactNode
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(() => readStoredUser())
-
-  const login = useCallback((next: AuthUser, options?: { remember?: boolean }) => {
-    const remember = options?.remember ?? true
-    const payload = JSON.stringify(next)
-    if (remember) {
-      localStorage.setItem(PERSIST_KEY, payload)
-      sessionStorage.removeItem(SESSION_KEY)
-    } else {
-      sessionStorage.setItem(SESSION_KEY, payload)
-      localStorage.removeItem(PERSIST_KEY)
-    }
-    setUser(next)
-  }, [])
-
-  const logout = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY)
-    localStorage.removeItem(PERSIST_KEY)
-    setUser(null)
-  }, [])
+  const { username, token, isAuthenticated, isLoading, error, login, logout } = useAuthStore()  
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      user,
-      isAuthenticated: user !== null,
+      username,
+      user: username,
+      token,
+      isAuthenticated,
+      isLoading,
+      error,
       login,
       logout,
     }),
-    [user, login, logout],
+    [username, token, isAuthenticated, isLoading, error, login, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

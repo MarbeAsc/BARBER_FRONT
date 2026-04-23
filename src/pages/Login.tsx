@@ -1,73 +1,42 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { z } from "zod";
 import { CustomButton } from "../components/Button";
 import { useAuth } from "../context/AuthContext";
+import { useLogin } from "../hooks/useAuth";
+import { useAuthStore } from "../lib/auth-store";
 
 const loginSchema = z.object({
-  email: z
+  username: z.string().trim().min(1, { message: "El usuario es requerido." }),
+    contrasena: z
     .string()
-    .trim()
-    .email({ message: "Introduce un correo corporativo válido." }),
-  password: z
-    .string()
-    .min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
 });
 
-type FieldErrors = Partial<Record<"email" | "password", string>>;
-
-function deriveNameFromEmail(email: string) {
-  const local = email.split("@")[0] ?? "Usuario";
-  const cleaned = local.replace(/[._-]+/g, " ").trim();
-  if (!cleaned) return "Usuario";
-  return cleaned.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/** Pon en `false` cuando la API de autenticación esté lista. Mientras tanto, entrar al panel no valida credenciales. */
-const PLACEHOLDER_LOGIN = true;
-
-const DEMO_USERS = {
-  admin: {
-    label: "Entrar como Administrador",
-    email: "admin@barberia.com",
-    password: "admin123",
-  },
-  barbero: {
-    label: "Entrar como Barbero",
-    email: "barbero@barberia.com",
-    password: "barbero123",
-  },
-  cliente: {
-    label: "Entrar como Cliente",
-    email: "cliente@barberia.com",
-    password: "cliente123",
-  },
-} as const;
+type FieldErrors = Partial<Record<"username" | "contrasena", string>>;
 
 export function Login() {
-  const emailId = useId();
-  const passwordId = useId();
+  const usernameId = useId();
+  const contrasenaId = useId();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const loginMutation = useLogin();
+  const authStoreLoading = useAuthStore((state) => state.isLoading);
 
   const from =
     (location.state as { from?: { pathname?: string } } | null)?.from
       ?.pathname ?? "/";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [showContrasena, setShowContrasena] = useState(false);
 
 
-  const [touched, setTouched] = useState<Record<"email" | "password", boolean>>(
-    {
-      email: false,
-      password: false,
-    },
-  );
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const isSubmitting = loginMutation.isPending || authStoreLoading;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -75,71 +44,41 @@ export function Login() {
     }
   }, [isAuthenticated, from, navigate]);
 
-  const fieldErrors = useMemo<FieldErrors>(() => {
-    const parsed = loginSchema.safeParse({ email, password });
-    if (!parsed.success) {
-      const next: FieldErrors = {};
-      for (const issue of parsed.error.issues) {
-        const key = issue.path[0];
-        if (key === "email" || key === "password") {
-          next[key] = issue.message;
-        }
-      }
-      return next;
+  const isFormValid = useMemo(
+    () => username.trim().length > 0 && contrasena.trim().length >= 8,
+    [username, contrasena],
+  );
+
+  const validateFields = () => {
+    const parsed = loginSchema.safeParse({ username, contrasena });
+    if (parsed.success) {
+      setFieldErrors({});
+      return true;
     }
-    return {};
-  }, [email, password]);
-
-  const runSubmit = async (credentials?: { email?: string; password?: string }) => {
-    setFormError(null);
-    const emailInput = credentials?.email ?? email;
-    const passwordInput = credentials?.password ?? password;
-
-    if (PLACEHOLDER_LOGIN) {
-      setIsSubmitting(true);
-      try {
-        const trimmed = emailInput.trim();
-        const emailOk = z.string().email().safeParse(trimmed).success;
-        const emailVal = emailOk ? trimmed : "demo@taskflow.app";
-        login({
-          email: emailVal,
-          name: deriveNameFromEmail(emailVal),
-        });
-        // Una sola navegación: el `useEffect` redirige al volver autenticado y dispara el loader global.
-      } finally {
-        setIsSubmitting(false);
+    const next: FieldErrors = {};
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0];
+      if (key === "username" || key === "contrasena") {
+        next[key] = issue.message;
       }
-      return;
     }
+    setFieldErrors(next);
+    return false;
+  };
 
-    setTouched({ email: true, password: true });
-    const parsed = loginSchema.safeParse({ email: emailInput, password: passwordInput });
-    if (!parsed.success) return;
+  const runSubmit = async () => {
+    if (!validateFields()) return;
 
-    setIsSubmitting(true);
     try {
-      await new Promise((r) => setTimeout(r, 850));
-      login({
-        email: parsed.data.email,
-        name: deriveNameFromEmail(parsed.data.email),
-      });
+      await loginMutation.mutateAsync({ username: username.trim(), contrasena });
       navigate(from, { replace: true });
     } catch {
-      setFormError("No fue posible iniciar sesión. Inténtalo de nuevo.");
-    } finally {
-      setIsSubmitting(false);
+      // Error feedback is handled globally via notifications in useLogin.
     }
   };
 
-  const loginAsDemoUser = (demo: (typeof DEMO_USERS)[keyof typeof DEMO_USERS]) => {
-    setEmail(demo.email);
-    setPassword(demo.password);
-    setTouched({ email: true, password: true });
-    void runSubmit({ email: demo.email, password: demo.password });
-  };
-
-  const emailError = touched.email ? fieldErrors.email : undefined;
-  const passwordError = touched.password ? fieldErrors.password : undefined;
+  const usernameError = fieldErrors.username;
+  const contrasenaError = fieldErrors.contrasena;
 
   return (
     <div className="login-page grid min-h-svh w-full bg-[#f4f4f5] text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
@@ -247,37 +186,40 @@ export function Login() {
             >
               <div className="space-y-2">
                 <label
-                  htmlFor={emailId}
+                  htmlFor={usernameId}
                   className="block text-left text-[0.8125rem] font-semibold tracking-wide text-slate-700"
                 >
                   Correo o usuario
                 </label>
                 <input
-                  id={emailId}
-                  name="email"
-                  type="email"
+                  id={usernameId}
+                  name="username"
+                  type="text"
                   autoComplete="username"
-                  inputMode="email"
-                  value={email}
+                  value={username}
                   autoFocus
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (fieldErrors.username) {
+                      setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                    }
+                  }}
                   className={`w-full rounded-xl border px-3.5 py-2.5 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 ${
-                    emailError
+                    usernameError
                       ? "border-rose-400/80 bg-rose-950/20 focus:border-rose-400 focus:shadow-[0_0_0_3px_rgba(251,113,133,0.18)]"
                       : "border-slate-200 bg-slate-50/30 hover:border-slate-300"
                   }`}
-                  placeholder="usuario@barberia.com"
-                  aria-invalid={Boolean(emailError)}
-                  aria-describedby={emailError ? `${emailId}-err` : undefined}
+                  placeholder="usuario@barberia.com o usuario"
+                  aria-invalid={Boolean(usernameError)}
+                  aria-describedby={usernameError ? `${usernameId}-err` : undefined}
                 />
-                {emailError ? (
+                {usernameError ? (
                   <p
-                    id={`${emailId}-err`}
+                    id={`${usernameId}-err`}
                     className="text-left text-xs font-medium leading-snug text-rose-300"
                     role="alert"
                   >
-                    {emailError}
+                    {usernameError}
                   </p>
                 ) : (
                   <p className="text-left text-xs leading-snug text-slate-500">
@@ -288,56 +230,60 @@ export function Login() {
 
               <div className="space-y-2">
                 <label
-                  htmlFor={passwordId}
+                  htmlFor={contrasenaId}
                   className="block text-left text-[0.8125rem] font-semibold tracking-wide text-slate-700"
                 >
                   Contraseña
                 </label>
                 <div className="relative">
                   <input
-                    id={passwordId}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
+                    id={contrasenaId}
+                    name="contrasena"
+                    type={showContrasena ? "text" : "password"}
                     autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                    value={contrasena}
+                    onChange={(e) => {
+                      setContrasena(e.target.value);
+                      if (fieldErrors.contrasena) {
+                        setFieldErrors((prev) => ({ ...prev, contrasena: undefined }));
+                      }
+                    }}
                     className={`w-full rounded-xl border px-3.5 py-2.5 pr-12 text-[0.9375rem] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 ${
-                      passwordError
+                      contrasenaError
                         ? "border-rose-400/80 bg-rose-950/20 focus:border-rose-400 focus:shadow-[0_0_0_3px_rgba(251,113,133,0.18)]"
                         : "border-slate-200 bg-slate-50/30 hover:border-slate-300"
                     }`}
                     placeholder="••••••••"
-                    aria-invalid={Boolean(passwordError)}
+                    aria-invalid={Boolean(contrasenaError)}
                     aria-describedby={
-                      passwordError ? `${passwordId}-err` : undefined
+                      contrasenaError ? `${contrasenaId}-err` : undefined
                     }
                   />
                   <CustomButton
                     type="button"
-                    onClick={() => setShowPassword((v) => !v)}
+                    onClick={() => setShowContrasena((v) => !v)}
                     variant="ghost"
                     iconOnly
                     className="absolute inset-y-0 right-0 my-auto mr-1 h-9 w-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-blue-700 active:scale-[0.98]"
-                    aria-pressed={showPassword}
+                    aria-pressed={showContrasena}
                     aria-label={
-                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                      showContrasena ? "Ocultar contraseña" : "Mostrar contraseña"
                     }
                   >
-                    {showPassword ? (
-                      <EyeOffIcon className="h-5 w-5" />
+                    {showContrasena ? (
+                      <FontAwesomeIcon icon={faEyeSlash} className="h-5 w-5" />
                     ) : (
-                      <EyeIcon className="h-5 w-5" />
+                      <FontAwesomeIcon icon={faEye} className="h-5 w-5" />
                     )}
                   </CustomButton>
                 </div>
-                {passwordError ? (
+                {contrasenaError ? (
                   <p
-                    id={`${passwordId}-err`}
+                    id={`${contrasenaId}-err`}
                     className="text-left text-xs font-medium leading-snug text-rose-300"
                     role="alert"
                   >
-                    {passwordError}
+                    {contrasenaError}
                   </p>
                 ) : null}
               </div>
@@ -355,66 +301,22 @@ export function Login() {
                 </CustomButton>
               </div>
 
-              {formError ? (
-                <p
-                  className="rounded-xl border border-rose-200/80 bg-rose-50/70 px-3.5 py-2.5 text-left text-sm font-medium leading-snug text-rose-800/90"
-                  role="alert"
-                >
-                  {formError}
-                </p>
-              ) : null}
-
               <CustomButton
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isFormValid}
                 variant="primary"
                 size="lg"
                 className="flex w-full items-center justify-center gap-2 rounded-xl"
               >
                 {isSubmitting ? (
                   <>
-                    <Spinner className="h-4 w-4" />
+                    <FontAwesomeIcon icon={faSpinner} className="h-4 w-4 animate-spin" />
                     Ingresando al sistema...
                   </>
                 ) : (
                   "Iniciar sesión"
                 )}
               </CustomButton>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-                <p className="mb-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                  Accesos de prueba
-                </p>
-                <div className="grid gap-2">
-                  <CustomButton
-                    type="button"
-                    variant="secondary"
-                    size="md"
-                    className="w-full rounded-lg text-left hover:border-blue-300 hover:bg-blue-50"
-                    onClick={() => loginAsDemoUser(DEMO_USERS.admin)}
-                  >
-                    {DEMO_USERS.admin.label}
-                  </CustomButton>
-                  <CustomButton
-                    type="button"
-                    variant="secondary"
-                    size="md"
-                    className="w-full rounded-lg text-left hover:border-blue-300 hover:bg-blue-50"
-                    onClick={() => loginAsDemoUser(DEMO_USERS.barbero)}
-                  >
-                    {DEMO_USERS.barbero.label}
-                  </CustomButton>
-                  <CustomButton
-                    type="button"
-                    variant="secondary"
-                    size="md"
-                    className="w-full rounded-lg text-left hover:border-blue-300 hover:bg-blue-50"
-                    onClick={() => loginAsDemoUser(DEMO_USERS.cliente)}
-                  >
-                    {DEMO_USERS.cliente.label}
-                  </CustomButton>
-                </div>
-              </div>
 
               <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5">
                 <span className="text-left text-[0.8125rem] text-slate-500">
@@ -448,64 +350,5 @@ export function Login() {
         </div>
       </div>
     </div>
-  );
-}
-
-function EyeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden
-    >
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
-function EyeOffIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden
-    >
-      <path d="M10.7 10.7a3 3 0 0 0 4.6 4.6" />
-      <path d="M9.88 5.09A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.17 3.79" />
-      <path d="M6.61 6.61A14.4 14.4 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 3.93-.83" />
-      <path d="M2 2l20 20" />
-    </svg>
-  );
-}
-
-function Spinner({ className }: { className?: string }) {
-  return (
-    <svg
-      className={`${className} animate-spin`}
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-90"
-        fill="currentColor"
-        d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"
-      />
-    </svg>
   );
 }

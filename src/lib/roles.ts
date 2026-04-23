@@ -1,5 +1,14 @@
 export type UserRole = 'Administrador' | 'Barbero' | 'Cliente'
 
+export function normalizeRole(value?: string | null): UserRole | undefined {
+  if (!value) return undefined
+  const normalized = value.toLowerCase().trim()
+  if (normalized === 'administrador' || normalized === 'admin') return 'Administrador'
+  if (normalized === 'barbero' || normalized === 'barber') return 'Barbero'
+  if (normalized === 'cliente' || normalized === 'client') return 'Cliente'
+  return undefined
+}
+
 export function inferRoleFromEmail(email?: string): UserRole {
   const source = (email ?? '').toLowerCase().trim()
   const localPart = source.split('@')[0] ?? ''

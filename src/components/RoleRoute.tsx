@@ -7,8 +7,8 @@ type RoleRouteProps = {
 }
 
 export function RoleRoute({ allow }: RoleRouteProps) {
-  const { user } = useAuth()
-  const role = inferRoleFromEmail(user?.email)
+  const { username } = useAuth()
+  const role = username?.role ?? inferRoleFromEmail(username?.email)
 
   if (!allow.includes(role)) {
     return <Navigate to="/" replace />

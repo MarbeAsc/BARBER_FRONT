@@ -44,9 +44,9 @@ export type LoginResult = {
 function mapRole(rawRole?: string): UserRole | undefined {
   if (!rawRole) return undefined
   const normalized = rawRole.toLowerCase().trim()
-  if (normalized === 'Administrador') return 'Administrador'
-  if (normalized === 'Barbero') return 'Barbero'
-  if (normalized === 'Cliente') return 'Cliente'
+  if (normalized === 'administrador' || normalized === 'admin') return 'Administrador'
+  if (normalized === 'barbero' || normalized === 'barber') return 'Barbero'
+  if (normalized === 'cliente' || normalized === 'client') return 'Cliente'
   return undefined
 }
 

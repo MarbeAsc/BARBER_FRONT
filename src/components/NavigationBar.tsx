@@ -28,6 +28,7 @@ type NavigationBarProps = {
   menuOpen: boolean
   userName?: string
   userEmail?: string
+  userRole?: UserRole
   onToggleMenu: () => void
   onCloseMenu: () => void
   onLogout: () => void
@@ -56,11 +57,12 @@ export function NavigationBar({
   menuOpen,
   userName,
   userEmail,
+  userRole,
   onToggleMenu,
   onCloseMenu,
   onLogout,
 }: NavigationBarProps) {
-  const role = inferRoleFromEmail(userEmail)
+  const role = userRole ?? inferRoleFromEmail(userEmail)
   const navItems = navItemsByRole[role]
   const [profileOpen, setProfileOpen] = useState(false)
   const [search, setSearch] = useState('')

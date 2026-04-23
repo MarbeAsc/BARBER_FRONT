@@ -19,7 +19,7 @@ const shellSurfaceStyle = {
 } as CSSProperties
 
 export function AppShell() {
-  const { user, logout } = useAuth()
+  const { username, logout } = useAuth()
   const location = useLocation()
   const menuId = useId()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -44,8 +44,9 @@ export function AppShell() {
       <NavigationBar
         menuId={menuId}
         menuOpen={menuOpen}
-        userName={user?.name}
-        userEmail={user?.email}
+        userName={username?.username}
+        userEmail={username?.email}
+        userRole={username?.role}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onCloseMenu={closeMenu}
         onLogout={logout}

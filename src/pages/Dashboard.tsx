@@ -23,7 +23,10 @@ type Appointment = {
 export function Dashboard() {
   const { username } = useAuth()
   const navigate = useNavigate()
-  const selectedRole = useMemo(() => inferRoleFromEmail(username?.email ?? ''), [username?.email])
+  const selectedRole = useMemo(
+    () => username?.role ?? inferRoleFromEmail(username?.email ?? ''),
+    [username?.role, username?.email],
+  )
 
   const quickActionsByRole: Record<
     UserRole,

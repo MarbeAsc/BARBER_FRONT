@@ -34,18 +34,18 @@ type NavigationBarProps = {
 }
 
 const navItemsByRole: Record<UserRole, NavItem[]> = {
-  admin: [
+    Administrador: [
     { to: '/', label: 'Panel general', icon: FaHome },
     { to: '/servicios', label: 'Servicios', icon: FaCut },
     { to: '/anadidos', label: 'Añadidos', icon: FaPlusCircle },
     { to: '/perfumes', label: 'Perfumes', icon: FaSprayCan },
     { to: '/barberos', label: 'Barberos', icon: FaUserTie },
   ],
-  barbero: [
+  Barbero: [
     { to: '/', label: 'Panel general', icon: FaHome },
     { to: '/mis-citas', label: 'Mis citas', icon: FaCalendarAlt },
   ],
-  cliente: [
+  Cliente: [
     { to: '/', label: 'Panel general', icon: FaHome },
     { to: '/mis-reservas', label: 'Reservar cita', icon: FaCalendarAlt },
   ],
@@ -85,7 +85,7 @@ export function NavigationBar({
     }
   }, [profileOpen])
 
-  const roleLabel = role === 'admin' ? 'Administrador' : role === 'barbero' ? 'Barbero' : 'Cliente'
+  const roleLabel = role === 'Administrador' ? 'Administrador' : role === 'Barbero' ? 'Barbero' : 'Cliente'
   const filteredNavItems = navItems.filter((item) =>
     item.label.toLowerCase().includes(search.trim().toLowerCase()),
   )

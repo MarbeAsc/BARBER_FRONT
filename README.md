@@ -57,9 +57,6 @@ src/
     cliente/
   providers/          # Providers de app (router/query/auth)
   router.tsx          # Mapa central de rutas y protecciones
-public/
-  manifest.webmanifest
-  sw.js
 ```
 
 ## Enrutado y proteccion de rutas
@@ -77,29 +74,6 @@ La app usa proteccion por autenticacion y por rol:
     - `admin`: `/servicios`, `/anadidos`, `/perfumes`, `/barberos`
     - `barbero`: `/mis-citas`
     - `cliente`: `/mis-reservas`
-
-## Implementacion PWA (nuevas mejoras)
-
-Se agrego soporte PWA con funcionamiento offline basico:
-
-- `index.html`
-  - `manifest`, `theme-color` y metadatos para instalacion en moviles.
-- `public/manifest.webmanifest`
-  - Configuracion de instalacion (`name`, `short_name`, `display`, `scope`, `start_url`, colores, icono).
-- `src/lib/registerServiceWorker.ts`
-  - Registro del service worker.
-- `public/sw.js`
-  - Cache de app shell.
-  - Estrategia para navegacion SPA con fallback offline a `index.html`.
-  - Cache dinamico de recursos GET del mismo origen.
-  - Manejo especial para modulos en desarrollo (`/src` y `/@fs`) para evitar fallos por query params dinamicos.
-
-### Consideraciones offline
-
-- La app debe abrirse al menos una vez con conexion para poblar cache.
-- Si no hay internet, la navegacion entre rutas ya cacheadas sigue funcionando.
-- En `npm run dev`, los errores de WebSocket de Vite HMR en offline son esperados y no representan fallo funcional de la PWA.
-- La validacion real de PWA se recomienda con `build + preview`.
 
 ## Stack tecnico
 

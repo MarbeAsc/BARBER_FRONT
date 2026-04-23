@@ -21,15 +21,15 @@ type Appointment = {
 }
 
 export function Dashboard() {
-  const { user } = useAuth()
+  const { username } = useAuth()
   const navigate = useNavigate()
-  const selectedRole = useMemo(() => inferRoleFromEmail(user?.email), [user?.email])
+  const selectedRole = useMemo(() => inferRoleFromEmail(username?.email ?? ''), [username?.email])
 
   const quickActionsByRole: Record<
     UserRole,
     Array<{ label: string; variant?: 'primary' | 'secondary'; onClick: () => void }>
   > = {
-    admin: [
+    Administrador: [
       {
         label: 'Gestionar servicios',
         variant: 'primary',
@@ -46,7 +46,7 @@ export function Dashboard() {
         onClick: () => navigate('/perfumes'),
       },
     ],
-    barbero: [
+    Barbero: [
       {
         label: 'Iniciar siguiente cita',
         variant: 'primary',
@@ -73,7 +73,7 @@ export function Dashboard() {
           }),
       },
     ],
-    cliente: [
+    Cliente: [
       {
         label: 'Reservar cita',
         variant: 'primary',
@@ -98,19 +98,19 @@ export function Dashboard() {
   }
 
   const kpisByRole: Record<UserRole, Kpi[]> = {
-    admin: [
+    Administrador: [
       { label: 'Servicios activos', value: '18', delta: '3 con extras nuevos' },
       { label: 'Barberos registrados', value: '6', delta: '1 disponible hoy' },
       { label: 'Citas del dia', value: '32', delta: '+14% vs. ayer' },
       { label: 'Ingresos estimados', value: '$1,280', delta: 'Ticket prom. $41' },
     ],
-    barbero: [
+    Barbero: [
       { label: 'Mis citas hoy', value: '8', delta: '2 en curso' },
       { label: 'Por atender', value: '3', delta: 'Próxima: 11:45' },
       { label: 'Atendidas', value: '5', delta: 'Buen ritmo de trabajo' },
       { label: 'Disponibilidad', value: '2 hrs', delta: 'Huecos entre 14:00 y 16:00' },
     ],
-    cliente: [
+    Cliente: [
       { label: 'Mis reservas', value: '2', delta: '1 para esta semana' },
       { label: 'Servicios favoritos', value: '3', delta: 'Corte clasico top' },
       { label: 'Barberos sugeridos', value: '4', delta: 'Segun tu historial' },
@@ -119,7 +119,7 @@ export function Dashboard() {
   }
 
   const appointmentsByRole: Record<UserRole, Appointment[]> = {
-    admin: [
+    Administrador: [
       {
         hour: '09:30',
         client: 'Carlos Mendoza',
@@ -145,12 +145,12 @@ export function Dashboard() {
         statusClass: 'bg-blue-100 text-blue-700',
       },
     ],
-    barbero: [
+    Barbero: [
       {
         hour: '10:30',
         client: 'Luis Herrera',
         service: 'Corte skin fade',
-        barber: user?.name ?? 'Tú',
+        barber: username?.username ?? 'Tú',
         status: 'Confirmada',
         statusClass: 'bg-emerald-100 text-emerald-700',
       },
@@ -158,7 +158,7 @@ export function Dashboard() {
         hour: '11:45',
         client: 'David Perea',
         service: 'Arreglo de barba',
-        barber: user?.name ?? 'Tú',
+        barber: username?.username ?? 'Tú',
         status: 'Pendiente',
         statusClass: 'bg-blue-100 text-blue-700',
       },
@@ -166,7 +166,7 @@ export function Dashboard() {
         hour: '13:00',
         client: 'Marco Solis',
         service: 'Corte + cejas',
-        barber: user?.name ?? 'Tú',
+        barber: username?.username ?? 'Tú',
         status: 'Pendiente',
         statusClass: 'bg-blue-100 text-blue-700',
       },
@@ -174,15 +174,15 @@ export function Dashboard() {
         hour: '15:00',
         client: 'Javier Ochoa',
         service: 'Corte clásico',
-        barber: user?.name ?? 'Tú',
+        barber: username?.username ?? 'Tú',
         status: 'Confirmada',
         statusClass: 'bg-emerald-100 text-emerald-700',
       },
     ],
-    cliente: [
+    Cliente: [
       {
         hour: '15:30',
-        client: user?.name ?? 'Tu reserva',
+        client: username?.username ?? 'Tu reserva',
         service: 'Corte clasico',
         barber: 'Luis',
         status: 'Disponible',
@@ -190,7 +190,7 @@ export function Dashboard() {
       },
       {
         hour: '16:15',
-        client: user?.name ?? 'Tu reserva',
+        client: username?.username ?? 'Tu reserva',
         service: 'Corte + barba',
         barber: 'Jorge',
         status: 'Pocas plazas',
@@ -198,7 +198,7 @@ export function Dashboard() {
       },
       {
         hour: '17:00',
-        client: user?.name ?? 'Tu reserva',
+        client: username?.username ?? 'Tu reserva',
         service: 'Perfilado',
         barber: 'Dario',
         status: 'Disponible',
@@ -223,16 +223,16 @@ export function Dashboard() {
                 Estado del sistema
               </p>
               <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
-                {selectedRole === 'admin' && 'Control central de operación'}
-                {selectedRole === 'barbero' && 'Agenda operativa del barbero'}
-                {selectedRole === 'cliente' && 'Gestión de reservas del cliente'}
+                {selectedRole === 'Administrador' && 'Control central de operación'}
+                {selectedRole === 'Barbero' && 'Agenda operativa del barbero'}
+                {selectedRole === 'Cliente' && 'Gestión de reservas del cliente'}
               </h2>
               <p className="mt-1 max-w-2xl text-sm text-blue-100/95">
-                {selectedRole === 'admin' &&
+                {selectedRole === 'Administrador' &&
                   'Monitorea servicios, usuarios y desempeño diario desde un único panel de administración.'}
-                {selectedRole === 'barbero' &&
+                {selectedRole === 'Barbero' &&
                   'Revisa tus citas asignadas, controla tu disponibilidad y da seguimiento al estado de atención.'}
-                {selectedRole === 'cliente' &&
+                {selectedRole === 'Cliente' &&
                   'Consulta servicios disponibles, selecciona barbero y agenda fecha/hora para tu próxima cita.'}
               </p>
             </div>
@@ -244,9 +244,9 @@ export function Dashboard() {
             Resumen del día
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            Buen día, {user?.name}
+            Buen día, {username?.username}
           </h1>
-          <p className="mt-2 text-sm text-slate-500">{user?.email}</p>
+          <p className="mt-2 text-sm text-slate-500">{username  ?.email}</p>
           <p className="mt-1 text-xs font-medium text-blue-700/90">
             Vista activa: {roleLabel(selectedRole)}
           </p>
@@ -273,14 +273,14 @@ export function Dashboard() {
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="text-base font-semibold text-slate-900">
-                {selectedRole === 'admin' && 'Citas globales de hoy'}
-                {selectedRole === 'barbero' && 'Tus citas programadas'}
-                {selectedRole === 'cliente' && 'Horarios recomendados'}
+                {selectedRole === 'Administrador' && 'Citas globales de hoy'}
+                {selectedRole === 'Barbero' && 'Tus citas programadas'}
+                {selectedRole === 'Cliente' && 'Horarios recomendados'}
               </h2>
               <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                {selectedRole === 'admin' && '32 citas programadas'}
-                {selectedRole === 'barbero' && '4 citas asignadas'}
-                {selectedRole === 'cliente' && 'Slots disponibles hoy'}
+                {selectedRole === 'Administrador' && '32 citas programadas'}
+                {selectedRole === 'Barbero' && '4 citas asignadas'}
+                {selectedRole === 'Cliente' && 'Slots disponibles hoy'}
               </span>
             </div>
 
@@ -320,35 +320,36 @@ export function Dashboard() {
           <aside className="space-y-4">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h3 className="text-sm font-semibold text-slate-900">
-                {selectedRole === 'admin' && 'Panel administrativo'}
-                {selectedRole === 'barbero' && 'Resumen operativo'}
-                {selectedRole === 'cliente' && 'Tu cuenta'}
+                {selectedRole === 'Administrador' && 'Panel administrativo'}
+                {selectedRole === 'Barbero' && 'Resumen operativo'}
+                {selectedRole === 'Cliente' && 'Tu cuenta'}
               </h3>
               <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
-                {selectedRole === 'admin' && '$1,280'}
-                {selectedRole === 'barbero' && '5/8'}
-                {selectedRole === 'cliente' && '2'}
+                {selectedRole === 'Administrador' && '$1,280'}
+                {selectedRole === 'Barbero' && '5/8'}
+                {selectedRole === 'Cliente' && '2'}
               </p>
               <p className="mt-1 text-xs text-emerald-600">
-                {selectedRole === 'admin' && '+8% comparado con ayer'}
-                {selectedRole === 'barbero' && 'Citas atendidas hoy'}
-                {selectedRole === 'cliente' && 'Reservas activas'}
+                {selectedRole === 'Administrador' && '+8% comparado con ayer'}
+                {selectedRole === 'Barbero' && 'Citas atendidas hoy'}
+                {selectedRole === 'Cliente' && 'Reservas activas'}
               </p>
+                {selectedRole === 'Cliente' && 'Reservas activas'}
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                 <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                  <p>{selectedRole === 'barbero' ? 'Tiempo promedio' : selectedRole === 'cliente' ? 'Favoritos' : 'Indicador A'}</p>
+                  <p>{selectedRole === 'Barbero' ? 'Tiempo promedio' : selectedRole === 'Cliente' ? 'Favoritos' : 'Indicador A'}</p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === 'admin' && '31'}
-                    {selectedRole === 'barbero' && '42 min'}
-                    {selectedRole === 'cliente' && '3'}
+                    {selectedRole === 'Administrador' && '31'}
+                    {selectedRole === 'Barbero' && '42 min'}
+                    {selectedRole === 'Cliente' && '3'}
                   </p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                  <p>{selectedRole === 'barbero' ? 'Siguiente hueco' : selectedRole === 'cliente' ? 'Ultimo corte' : 'Indicador B'}</p>
+                    <p>{selectedRole === 'Barbero' ? 'Siguiente hueco' : selectedRole === 'Cliente' ? 'Ultimo corte' : 'Indicador B'}</p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === 'admin' && '$41'}
-                    {selectedRole === 'barbero' && '14:00'}
-                    {selectedRole === 'cliente' && 'Hace 12 dias'}
+                    {selectedRole === 'Administrador' && '$41'}
+                    {selectedRole === 'Barbero' && '14:00'}
+                    {selectedRole === 'Cliente' && 'Hace 12 dias'}
                   </p>
                 </div>
               </div>

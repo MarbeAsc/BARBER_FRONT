@@ -134,19 +134,19 @@ export function NavigationBar({
 
           {profileOpen ? (
             <div
-              className="nav-profile-dropdown absolute right-0 top-[calc(100%+10px)] z-70 w-72 rounded-2xl border border-slate-200/80 bg-white/95 p-2.5 shadow-[0_26px_48px_-24px_rgba(2,6,23,0.55)] backdrop-blur-sm"
+              className="nav-profile-dropdown absolute right-0 top-[calc(100%+10px)] z-70 w-72 rounded-2xl border border-cyan-200/30 bg-[linear-gradient(145deg,rgba(9,23,45,0.97)_0%,rgba(13,42,82,0.94)_55%,rgba(12,35,69,0.97)_100%)] p-2.5 shadow-[0_26px_48px_-24px_rgba(2,6,23,0.75)] backdrop-blur-sm"
               role="menu"
             >
-              <div className="nav-profile-card rounded-xl border border-slate-100 bg-linear-to-br from-slate-50 via-slate-100 to-blue-50/70 px-3 py-2.5">
-                <p className="truncate text-[15px] font-semibold text-slate-900">{userName ?? 'Usuario'}</p>
-                <p className="mt-0.5 truncate text-xs text-slate-600">{userEmail}</p>
-                <p className="nav-profile-role-chip mt-1.5 inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-700">
+              <div className="nav-profile-card rounded-xl border border-cyan-200/20 bg-[linear-gradient(140deg,rgba(255,255,255,0.13)_0%,rgba(255,255,255,0.07)_100%)] px-3 py-2.5">
+                <p className="truncate text-[15px] font-semibold text-white">{userName ?? 'Usuario'}</p>
+                <p className="mt-0.5 truncate text-xs text-blue-100/85">{userEmail}</p>
+                <p className="nav-profile-role-chip mt-1.5 inline-flex rounded-full border border-blue-200/40 bg-blue-500/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-100">
                   {roleLabel}
                 </p>
               </div>
               <button
                 type="button"
-                className="nav-profile-logout mt-2 inline-flex w-full items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-left text-sm font-semibold text-rose-700 outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-[0_10px_20px_-18px_rgba(190,18,60,0.85)] focus-visible:ring-2 focus-visible:ring-rose-300/70"
+                className="nav-profile-logout mt-2 inline-flex w-full items-center gap-2 rounded-xl border border-white/70 bg-white px-3 py-2.5 text-left text-sm font-semibold text-slate-800 outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-rose-300/70 hover:bg-rose-500 hover:text-white hover:shadow-[0_10px_20px_-18px_rgba(190,24,93,0.55)] focus-visible:ring-2 focus-visible:ring-rose-300/70"
                 onClick={() => {
                   setProfileOpen(false)
                   onLogout()

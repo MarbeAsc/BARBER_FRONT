@@ -1,5 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigation } from 'react-router-dom'
+import {
+  routeHasTableQueries,
+  shouldBlockTableRoute,
+  useRouteTableLoaderBlocking,
+} from '@/hooks/useTableDataRouteBlocking'
 
 /** Tiempo mínimo visible del loader para evitar parpadeo visual. */
 const MIN_VISIBLE_MS = 360
@@ -18,6 +24,10 @@ function pathToPanelLabel(pathname: string): string {
     '/anadidos': 'Añadidos',
     '/perfumes': 'Perfumes',
     '/barberos': 'Barberos',
+    '/Barberos': 'Barberos',
+    '/promociones': 'Promociones',
+    '/promociones-cliente': 'Promociones',
+    '/promociones-barbero': 'Promociones',
     '/usuarios': 'Usuarios',
     '/mis-citas': 'Mis citas',
     '/mis-reservas': 'Mis reservas',
@@ -53,12 +63,13 @@ function defaultCopy(pathname: string): LoaderCopy {
 }
 
 /**
- * Loader global único para transiciones de navegación.
- * Concentramos en un solo componente la lógica y la UI (estilo ANFORA).
+ * Loader global: transiciones de navegación (lazy) + primera carga de datos de tablas (React Query), estilo ANFORA.
  */
 export function Loader() {
   const navigation = useNavigation()
   const location = useLocation()
+  const queryClient = useQueryClient()
+  const tableBlocking = useRouteTableLoaderBlocking(location.pathname)
 
   const [fromRouter, setFromRouter] = useState(false)
   const [fromPathChange, setFromPathChange] = useState(false)
@@ -88,13 +99,32 @@ export function Loader() {
       return
     }
 
+    const nextPath = navigation.location?.pathname ?? location.pathname
     const elapsed = performance.now() - loadStartedAt.current
     const remainder = Math.max(0, MIN_VISIBLE_MS - elapsed)
-    hideRouterTimeout.current = setTimeout(() => {
+
+    const finishHide = () => {
       setFromRouter(false)
       loadStartedAt.current = null
       hideRouterTimeout.current = null
-    }, remainder)
+    }
+
+    const waitTableThenHide = () => {
+      if (!routeHasTableQueries(nextPath)) {
+        hideRouterTimeout.current = setTimeout(finishHide, remainder)
+        return
+      }
+      const poll = () => {
+        if (!shouldBlockTableRoute(queryClient, nextPath)) {
+          finishHide()
+          return
+        }
+        hideRouterTimeout.current = setTimeout(poll, 48)
+      }
+      hideRouterTimeout.current = setTimeout(poll, remainder)
+    }
+
+    waitTableThenHide()
 
     return () => {
       if (hideRouterTimeout.current) {
@@ -102,7 +132,7 @@ export function Loader() {
         hideRouterTimeout.current = null
       }
     }
-  }, [navigation.state, navigation.location?.pathname, location.pathname])
+  }, [navigation.state, navigation.location?.pathname, location.pathname, queryClient])
 
   useEffect(() => {
     const prev = prevPathname.current
@@ -131,7 +161,7 @@ export function Loader() {
     }
   }, [location.pathname])
 
-  const visible = fromRouter || fromPathChange
+  const visible = fromRouter || fromPathChange || tableBlocking
   if (!visible) return null
 
   return (

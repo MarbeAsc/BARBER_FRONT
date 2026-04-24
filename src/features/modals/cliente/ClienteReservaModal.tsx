@@ -25,18 +25,18 @@ export function ClienteReservaModal({
 
   return (
     <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
-      <section className="w-full max-w-5xl rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <section className="w-full max-w-5xl rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
+        <header className="flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Cliente</p>
-            <h2 className="text-lg font-semibold text-slate-900">Nueva reserva interactiva</h2>
+            <h2 className="text-xl font-semibold text-slate-900">Nueva reserva interactiva</h2>
           </div>
           <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={onClose} aria-label="Cerrar modal">
             <FaTimes className="h-4 w-4" />
           </CustomButton>
         </header>
 
-        <div className="max-h-[80vh] overflow-auto p-5">
+        <div className="max-h-[80vh] overflow-auto p-6">
           <ClienteReservaForm
             servicios={servicios}
             horasDisponibles={horasDisponibles}

@@ -99,7 +99,7 @@ export function NavigationBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex items-center gap-3 border-b border-blue-500/35 bg-linear-to-r from-[#121216] via-[#15151b] to-[#0f0f14] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_8px_28px_-12px_rgba(0,0,0,0.6)] sm:px-5">
+      <header className="sticky top-0 z-50 flex items-center gap-3 border-b border-cyan-300/24 bg-[linear-gradient(130deg,#081a36_0%,#0f2f63_52%,#0d3d69_100%)] px-4 py-3 shadow-[0_1px_0_rgba(186,230,253,0.08)_inset,0_12px_28px_-16px_rgba(2,6,23,0.68)] sm:px-5">
         <button
           type="button"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent text-blue-50 outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-blue-300/50"
@@ -172,7 +172,7 @@ export function NavigationBar({
 
       <aside
         id={menuId}
-        className={`fixed left-0 top-0 z-50 flex h-full w-[min(280px,88vw)] flex-col border-r border-white/10 bg-zinc-950 pb-6 pt-17 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.55)] transition-transform duration-200 ease-out ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-[min(280px,88vw)] flex-col border-r border-cyan-300/24 bg-[linear-gradient(130deg,#081a36_0%,#0f2f63_52%,#0d3d69_100%)] pb-6 pt-17 shadow-[4px_0_28px_-8px_rgba(2,6,23,0.68)] transition-transform duration-200 ease-out ${
           menuOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         }`}
         aria-hidden={!menuOpen}

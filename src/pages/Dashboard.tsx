@@ -285,9 +285,9 @@ export function Dashboard() {
   }
 
   return (
-    <div className="w-full min-w-0 bg-linear-to-b from-slate-50 via-white to-indigo-50/30">
+    <div className="w-full min-w-0 bg-linear-to-b from-slate-100 via-slate-50 to-slate-100">
       <main className="mx-auto max-w-7xl px-4 py-8 text-slate-700 sm:px-6 lg:px-8 lg:py-10">
-        <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm shadow-blue-100/40 backdrop-blur">
+        <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-sm shadow-slate-200/70 backdrop-blur">
           <div className="group relative">
             <img
               src="/logo+.jpg"
@@ -316,7 +316,7 @@ export function Dashboard() {
           </div>
         </section>
 
-        <div className="mb-8 rounded-3xl border border-blue-100/80 bg-linear-to-r from-blue-50 via-indigo-50/70 to-white px-6 py-5 shadow-sm shadow-blue-100/40">
+        <div className="mb-8 rounded-3xl border border-slate-200/90 bg-linear-to-r from-[#f3f7ff] via-[#eef4ff] to-[#f8fbff] px-6 py-5 shadow-sm shadow-slate-200/70">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">
             Resumen del día
           </p>
@@ -334,7 +334,7 @@ export function Dashboard() {
               key={card.label}
               type="button"
               onClick={kpiActionsByRole[selectedRole][index]}
-              className="group rounded-2xl border border-slate-200/80 bg-linear-to-br from-white via-white to-indigo-50/40 p-4 text-left shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+              className="group rounded-2xl border border-slate-200/90 bg-linear-to-br from-white via-[#f9fbff] to-[#edf3ff] p-4 text-left shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-md hover:shadow-blue-100/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
             >
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="inline-flex h-1.5 w-9 rounded-full bg-linear-to-r from-sky-400 to-indigo-500" />
@@ -358,7 +358,7 @@ export function Dashboard() {
         </section>
 
         <div className="mx-auto grid gap-6 lg:grid-cols-3">
-          <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm shadow-blue-100/40 lg:col-span-2">
+          <section className="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-sm shadow-slate-200/70 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="text-base font-semibold text-slate-900">
                 {selectedRole === 'Administrador' && 'Estado operativo del sistema'}
@@ -442,22 +442,22 @@ export function Dashboard() {
               )
             ) : selectedRole === 'Administrador' ? (
               <div className="grid gap-3 sm:grid-cols-2">
-                <article className="rounded-xl border border-sky-100 bg-sky-50/60 p-4 transition-colors hover:border-sky-200 hover:bg-white">
+                <article className="rounded-xl border border-blue-100/80 bg-blue-50/45 p-4 transition-colors hover:border-blue-200 hover:bg-white">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Servicios</p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">{serviciosActivos}</p>
                   <p className="text-xs text-slate-500">Activos de {servicios.length} registrados</p>
                 </article>
-                <article className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 transition-colors hover:border-indigo-200 hover:bg-white">
+                <article className="rounded-xl border border-blue-100/80 bg-blue-50/45 p-4 transition-colors hover:border-blue-200 hover:bg-white">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Barberos</p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">{barberosActivos}</p>
                   <p className="text-xs text-slate-500">Activos de {barberos.length} registrados</p>
                 </article>
-                <article className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 transition-colors hover:border-emerald-200 hover:bg-white">
+                <article className="rounded-xl border border-blue-100/80 bg-blue-50/45 p-4 transition-colors hover:border-blue-200 hover:bg-white">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuarios</p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">{usuariosActivos}</p>
                   <p className="text-xs text-slate-500">Activos de {usuarios.length} en total</p>
                 </article>
-                <article className="rounded-xl border border-amber-100 bg-amber-50/60 p-4 transition-colors hover:border-amber-200 hover:bg-white">
+                <article className="rounded-xl border border-blue-100/80 bg-blue-50/45 p-4 transition-colors hover:border-blue-200 hover:bg-white">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Promociones</p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">{promocionesVigentesAll.length}</p>
                   <p className="text-xs text-slate-500">{promocionesPorVencer} por vencer en 3 días</p>
@@ -499,7 +499,7 @@ export function Dashboard() {
           </section>
 
           <aside className="space-y-4">
-            <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm shadow-blue-100/40">
+            <section className="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-sm shadow-slate-200/70">
               <h3 className="text-sm font-semibold text-slate-900">
                 {selectedRole === 'Administrador' && 'Panel administrativo'}
                 {selectedRole === 'Barbero' && 'Resumen operativo'}
@@ -539,7 +539,7 @@ export function Dashboard() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-indigo-200/80 bg-linear-to-br from-indigo-50 via-blue-50 to-white p-5 shadow-sm shadow-indigo-100/40">
+            <section className="rounded-3xl border border-blue-200/80 bg-linear-to-br from-[#eef4ff] via-[#f3f7ff] to-white p-5 shadow-sm shadow-blue-100/50">
               <h3 className="text-sm font-semibold text-slate-900">
                 Acciones rapidas
               </h3>

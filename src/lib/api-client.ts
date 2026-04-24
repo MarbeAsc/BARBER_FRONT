@@ -1,3 +1,7 @@
+/**
+ * Cliente Axios singleton (`apiSSO`): base URL desde `API_CONFIG`, JWT en `Authorization`,
+ * anti-caché con `_t` en query, y cierre de sesión ante respuestas 401.
+ */
 import axios, { type AxiosInstance } from 'axios'
 import { API_CONFIG } from './api-config'
 import { useAuthStore } from './auth-store'

@@ -1,3 +1,7 @@
+/**
+ * Definición central de rutas: públicas, área autenticada (`AppShell`) y segmentos por rol.
+ * Las páginas bajo rutas privadas se cargan con `lazy` para dividir el bundle.
+ */
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { PublicFlowRoute } from './components/PublicFlowRoute'
@@ -69,7 +73,7 @@ export const router = createBrowserRouter([
                     },
                   },
                   {
-                    path: 'Barberos',
+                    path: 'barberos',
                     lazy: async () => {
                       const { AdminBarberosPage } = await import('./pages/admin/AdminBarberosPage')
                       return { Component: AdminBarberosPage }

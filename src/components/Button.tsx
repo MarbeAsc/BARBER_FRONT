@@ -69,7 +69,7 @@ export function CustomButton({
       type={type}
       disabled={isDisabled}
       aria-busy={isLoading ? 'true' : 'false'}
-      className={`rounded-md font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:pointer-events-none disabled:opacity-60 ${
+      className={`cursor-pointer rounded-md font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 ${
         variantClass[variant]
       } ${iconOnly ? iconOnlyClass : sizeClass[size]} ${className}`.trim()}
     >

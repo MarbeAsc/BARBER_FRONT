@@ -1,5 +1,47 @@
 @import 'tailwindcss';
 
+@layer base {
+  a[href]:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  [role='button']:not([aria-disabled='true']),
+  [role='menuitem']:not([aria-disabled='true']),
+  [role='tab']:not([aria-disabled='true']),
+  [role='link']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  input[type='button']:not(:disabled),
+  input[type='submit']:not(:disabled),
+  input[type='reset']:not(:disabled),
+  input[type='checkbox']:not(:disabled),
+  input[type='radio']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  label[for] {
+    cursor: pointer;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input[type='button']:disabled,
+  input[type='submit']:disabled,
+  input[type='reset']:disabled,
+  input[type='checkbox']:disabled,
+  input[type='radio']:disabled {
+    cursor: not-allowed;
+  }
+}
+
 html {
   background-color: #fbfdfc;
 }

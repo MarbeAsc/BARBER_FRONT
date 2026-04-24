@@ -21,6 +21,25 @@ const muiTheme = createTheme({
       main: '#2563eb',
     },
   },
+  components: {
+    MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          cursor: 'pointer',
+          '&.Mui-disabled': {
+            cursor: 'not-allowed',
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          cursor: 'pointer',
+        },
+      },
+    },
+  },
 })
 
 export function AppProviders() {

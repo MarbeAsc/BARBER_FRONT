@@ -147,7 +147,7 @@ export function NavigationBar({
               </div>
               <button
                 type="button"
-                className="nav-profile-logout mt-2 inline-flex w-full items-center gap-2 rounded-xl border border-white/70 bg-white px-3 py-2.5 text-left text-sm font-semibold text-slate-800 outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-rose-300/70 hover:bg-rose-500 hover:text-white hover:shadow-[0_10px_20px_-18px_rgba(190,24,93,0.55)] focus-visible:ring-2 focus-visible:ring-rose-300/70"
+                className="nav-profile-logout mt-2 inline-flex w-full items-center gap-2 rounded-xl border border-white/70 bg-white px-3 py-2.5 text-left text-sm font-semibold text-slate-800 outline-none transition-all duration-200 active:border-rose-300/70 active:bg-rose-500 active:text-white sm:hover:-translate-y-0.5 sm:hover:border-rose-300/70 sm:hover:bg-rose-500 sm:hover:text-white sm:hover:shadow-[0_10px_20px_-18px_rgba(190,24,93,0.55)] focus-visible:ring-2 focus-visible:ring-rose-300/70"
                 onClick={() => {
                   setProfileOpen(false)
                   onLogout()

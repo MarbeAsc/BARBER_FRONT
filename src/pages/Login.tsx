@@ -305,8 +305,8 @@ export function Login() {
             </form>
           </div>
 
-          <p className="mt-9 text-center text-[0.8125rem] leading-relaxed text-slate-500">
-            ¿No tienes acceso?{" "}
+          <p className="mt-9 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-center text-[0.8125rem] leading-relaxed text-slate-500">
+            <span>¿No tienes acceso?</span>
             <CustomButton
               type="button"
               variant="link"
@@ -314,7 +314,19 @@ export function Login() {
               className="p-0 font-semibold underline decoration-blue-300"
               onClick={() => navigate('/contacto', { state: { allowPublicFlow: true } })}
             >
-              contáctanos
+              Contáctanos
+            </CustomButton>
+            <span className="text-slate-400" aria-hidden>
+              ·
+            </span>
+            <CustomButton
+              type="button"
+              variant="link"
+              size="sm"
+              className="p-0 font-semibold underline decoration-blue-300"
+              onClick={() => navigate('/contacto', { state: { allowPublicFlow: true } })}
+            >
+              ¿Necesitas ayuda?
             </CustomButton>
           </p>
         </div>

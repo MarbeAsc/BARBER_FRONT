@@ -117,7 +117,11 @@ export function NavigationBar({
         <div className="relative" ref={profileRef}>
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-xl border border-blue-400/40 bg-blue-800/25 px-3 py-1.5 text-sm font-semibold text-blue-50 transition hover:bg-blue-700/40"
+            className={`nav-profile-trigger inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-semibold text-blue-50 outline-none transition-all duration-200 ${
+              profileOpen
+                ? 'border-blue-200/70 bg-blue-600/50 shadow-[0_8px_24px_-14px_rgba(59,130,246,0.95)]'
+                : 'border-blue-400/45 bg-blue-800/25 hover:border-blue-200/60 hover:bg-blue-700/40 hover:shadow-[0_8px_24px_-16px_rgba(59,130,246,0.75)]'
+            } focus-visible:ring-2 focus-visible:ring-blue-300/65`}
             onClick={() => setProfileOpen((prev) => !prev)}
             aria-expanded={profileOpen}
             aria-haspopup="menu"
@@ -125,19 +129,24 @@ export function NavigationBar({
             <FaUserCircle className="h-5 w-5 text-blue-100/90" />
             <span className="max-w-[160px] truncate hidden sm:inline">{userEmail}</span>
             <span className="sm:hidden">Perfil</span>
-            <FaChevronDown className={`h-3.5 w-3.5 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+            <FaChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {profileOpen ? (
-            <div className="absolute right-0 top-[calc(100%+8px)] z-70 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-xl" role="menu">
-              <div className="rounded-lg bg-slate-50 px-3 py-2">
-                <p className="truncate text-sm font-semibold text-slate-900">{userName ?? 'Usuario'}</p>
-                <p className="truncate text-xs text-slate-500">{userEmail}</p>
-                <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-700">{roleLabel}</p>
+            <div
+              className="nav-profile-dropdown absolute right-0 top-[calc(100%+10px)] z-70 w-72 rounded-2xl border border-slate-200/80 bg-white/95 p-2.5 shadow-[0_26px_48px_-24px_rgba(2,6,23,0.55)] backdrop-blur-sm"
+              role="menu"
+            >
+              <div className="nav-profile-card rounded-xl border border-slate-100 bg-linear-to-br from-slate-50 via-slate-100 to-blue-50/70 px-3 py-2.5">
+                <p className="truncate text-[15px] font-semibold text-slate-900">{userName ?? 'Usuario'}</p>
+                <p className="mt-0.5 truncate text-xs text-slate-600">{userEmail}</p>
+                <p className="nav-profile-role-chip mt-1.5 inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-700">
+                  {roleLabel}
+                </p>
               </div>
               <button
                 type="button"
-                className="mt-2 inline-flex w-full items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-left text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+                className="nav-profile-logout mt-2 inline-flex w-full items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-left text-sm font-semibold text-rose-700 outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-[0_10px_20px_-18px_rgba(190,18,60,0.85)] focus-visible:ring-2 focus-visible:ring-rose-300/70"
                 onClick={() => {
                   setProfileOpen(false)
                   onLogout()

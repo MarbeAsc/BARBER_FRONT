@@ -100,6 +100,13 @@ export const router = createBrowserRouter([
                 element: <RoleRoute allow={['Cliente']} />,
                 children: [
                   {
+                    path: 'promociones-cliente',
+                    lazy: async () => {
+                      const { ClientePromocionesPage } = await import('./pages/cliente/ClientePromocionesPage')
+                      return { Component: ClientePromocionesPage }
+                    },
+                  },
+                  {
                     path: 'mis-reservas',
                     lazy: async () => {
                       const { ClienteReservasPage } = await import('./pages/cliente/ClienteReservasPage')

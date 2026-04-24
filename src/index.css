@@ -225,10 +225,84 @@ code {
   animation-delay: 0.3s;
 }
 
+@keyframes notification-toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-24px, 14px, 0) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(3px, -2px, 0) scale(1.01);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes notification-toast-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 24px -14px rgba(30, 64, 175, 0.35),
+      0 0 0 0 rgba(59, 130, 246, 0.14);
+  }
+  50% {
+    box-shadow:
+      0 12px 30px -16px rgba(30, 64, 175, 0.45),
+      0 0 0 6px rgba(59, 130, 246, 0.05);
+  }
+}
+
+.notification-toast {
+  animation:
+    notification-toast-in 0.46s cubic-bezier(0.22, 1, 0.36, 1) both,
+    notification-toast-glow 2.6s ease-in-out;
+}
+
+@keyframes notification-toast-dot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.28);
+    opacity: 0.55;
+  }
+}
+
+.notification-toast-dot {
+  animation: notification-toast-dot-pulse 1.35s ease-in-out infinite;
+}
+
+@keyframes notification-toast-progress {
+  from {
+    transform: scaleX(1);
+    opacity: 0.85;
+  }
+  to {
+    transform: scaleX(0);
+    opacity: 0.25;
+  }
+}
+
+.notification-toast-progress {
+  position: absolute;
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: 0.42rem;
+  height: 3px;
+  border-radius: 999px;
+  transform-origin: left center;
+  animation: notification-toast-progress 4.2s linear forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nav-loader-pop,
   .nav-loader-glow,
-  .nav-loader-dot {
+  .nav-loader-dot,
+  .notification-toast {
     animation: none !important;
   }
 

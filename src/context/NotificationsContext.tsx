@@ -18,10 +18,17 @@ type NotificationsContextValue = {
 const NotificationsContext = createContext<NotificationsContextValue | null>(null)
 
 const variantStyles: Record<NotificationVariant, string> = {
-  info: 'border-blue-200 bg-blue-50 text-blue-800',
-  success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-  warning: 'border-orange-200 bg-orange-50 text-orange-800',
-  error: 'border-rose-200 bg-rose-50 text-rose-800',
+  info: 'border-blue-200/90 bg-linear-to-r from-blue-50 to-sky-50 text-blue-900',
+  success: 'border-emerald-200/90 bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-900',
+  warning: 'border-amber-200/90 bg-linear-to-r from-amber-50 to-orange-50 text-amber-900',
+  error: 'border-rose-200/90 bg-linear-to-r from-rose-50 to-pink-50 text-rose-900',
+}
+
+const variantAccentStyles: Record<NotificationVariant, string> = {
+  info: 'bg-blue-600',
+  success: 'bg-emerald-600',
+  warning: 'bg-amber-500',
+  error: 'bg-rose-600',
 }
 
 function buildNotification(payload: NotificationPayload): NotificationItem {
@@ -85,14 +92,22 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     <NotificationsContext.Provider value={value}>
       {children}
 
-      <div className="pointer-events-none fixed right-4 top-20 z-1100 flex w-[min(92vw,360px)] flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-4 left-4 z-1100 flex w-[min(94vw,420px)] flex-col gap-3">
         {toastQueue.map((item) => (
           <article
             key={item.id}
-            className={`pointer-events-auto rounded-xl border px-3 py-2 shadow-sm ${variantStyles[item.variant ?? 'info']}`}
+            className={`notification-toast pointer-events-auto relative overflow-hidden rounded-2xl border px-4 py-3 shadow-lg shadow-slate-900/10 ring-1 ring-white/70 ${variantStyles[item.variant ?? 'info']}`}
           >
-            <p className="text-sm font-semibold">{item.title}</p>
-            <p className="mt-0.5 text-xs">{item.message}</p>
+            <div className="flex items-start gap-3">
+              <span
+                className={`notification-toast-dot mt-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ${variantAccentStyles[item.variant ?? 'info']}`}
+              />
+              <div>
+                <p className="text-base font-bold tracking-tight">{item.title}</p>
+                <p className="mt-1 text-sm leading-5 text-slate-700">{item.message}</p>
+              </div>
+            </div>
+            <span className={`notification-toast-progress ${variantAccentStyles[item.variant ?? 'info']}`} />
           </article>
         ))}
       </div>

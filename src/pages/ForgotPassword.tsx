@@ -8,68 +8,46 @@ export function ForgotPassword() {
   const [submitted, setSubmitted] = useState(false)
 
   return (
-    <main className="grid min-h-svh w-full bg-[#f4f4f5] text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-      <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#111215] p-10 text-zinc-100 sm:p-12 lg:flex lg:border-r lg:border-white/10 lg:shadow-[inset_-1px_0_0_rgba(255,255,255,0.06)]">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(10,10,12,0.96)_0%,rgba(22,23,28,0.92)_42%,rgba(10,10,12,0.96)_100%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_70%_at_10%_10%,rgba(59,130,246,0.2),transparent_60%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_60%_at_100%_100%,rgba(59,130,246,0.18),transparent_60%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute right-[-11%] top-[-9%] h-[58%] w-[22%] rotate-12 rounded-full bg-[repeating-linear-gradient(180deg,rgba(239,68,68,0.9)_0_16px,rgba(255,255,255,0.92)_16px_32px,rgba(37,99,235,0.9)_32px_48px)] opacity-20 blur-[1px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-[-17%] left-[-8%] h-[60%] w-[20%] -rotate-15 rounded-full bg-[repeating-linear-gradient(180deg,rgba(239,68,68,0.86)_0_16px,rgba(255,255,255,0.88)_16px_32px,rgba(37,99,235,0.86)_32px_48px)] opacity-15 blur-[2px]"
-          aria-hidden
-        />
+    <main className="login-page login-layout grid min-h-svh w-full text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+      <aside className="login-hero login-hero-redesign relative hidden flex-col overflow-hidden p-10 text-zinc-100 sm:p-12 lg:flex">
+        <div className="login-hero-canvas pointer-events-none absolute inset-0" aria-hidden />
+        <div className="login-floating-card login-floating-card--top" aria-hidden>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-cyan-100/90">Barberia</p>
+          <p className="mt-1 text-lg font-semibold text-white">Sistema pro</p>
+        </div>
+        <div className="login-floating-card login-floating-card--bottom" aria-hidden>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blue-100/90">Operativo</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">Agenda + Clientes + Caja</p>
+        </div>
+        <div className="login-floating-card login-floating-card--mid login-floating-card--mini" aria-hidden>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.15em] text-cyan-100/85">Seguridad</p>
+          <p className="mt-1 text-sm font-medium text-white">Recuperacion segura</p>
+        </div>
+        <div className="login-floating-card login-floating-card--left login-floating-card--mini" aria-hidden>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.15em] text-blue-100/85">Acceso</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">Restablece rapido</p>
+        </div>
 
-        <div className="relative z-10 max-w-lg space-y-5">
-          <span className="inline-flex rounded-full border border-blue-300/35 bg-blue-400/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-blue-200">
-            Barber Suite
+        <div className="relative z-10 max-w-xl space-y-5">
+          <span className="login-kicker inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-[0.69rem] font-semibold uppercase tracking-[0.2em] text-cyan-100">
+            Barber Shop
           </span>
-          <h2 className="text-balance text-[1.65rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white sm:text-3xl lg:text-[2.125rem]">
-            BarberShop Manager
+          <h2 className="text-balance text-[1.8rem] font-semibold leading-[1.12] tracking-[-0.02em] text-white sm:text-[2.15rem] lg:text-[2.45rem]">
+            Recupera tu acceso
           </h2>
-          <p className="max-w-prose text-[0.9375rem] leading-relaxed text-zinc-300">
-            Controla citas, barberos y clientes en una sola plataforma.
-            Diseñado para barberías que cuidan cada detalle del servicio.
+          <p className="login-hero-description max-w-md text-sm text-slate-300/90">
+            Restablece tu contrasena para volver a gestionar agenda, clientes y caja.
           </p>
         </div>
 
-        <ul
-          className="login-feature-list relative z-10 mt-14 max-w-lg space-y-4 text-[0.9375rem] leading-snug"
-          aria-label="Capacidades principales"
-        >
-          {[
-            'Agenda diaria con disponibilidad en tiempo real',
-            'Historial de clientes y servicios por barbero',
-            'Gestión de caja, turnos y productividad del equipo',
-          ].map((label) => (
-            <li
-              key={label}
-              className="flex gap-3.5 text-zinc-200 transition-[opacity,transform] duration-300 ease-out hover:translate-x-0.5 hover:opacity-95"
-            >
-              <span
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-300 shadow-[0_0_0_1px_rgba(191,219,254,0.45)] transition-opacity duration-300"
-                aria-hidden
-              />
-              <span>{label}</span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="relative z-10 mt-auto max-w-md pt-14 text-[0.6875rem] leading-relaxed text-zinc-400">
-          Acceso exclusivo para personal autorizado. Si olvidaste tus
-          credenciales, consulta con el administrador del local.
-        </p>
+        <div className="login-hero-metrics relative z-10 mt-auto max-w-xl" aria-label="Ventajas de recuperacion">
+          <div className="login-hero-metric">
+            <span>Enlace de recuperacion en minutos</span>
+          </div>
+          <div className="login-hero-metric">
+            <span>Proceso rapido y seguro</span>
+          </div>
+        </div>
       </aside>
 
       <section className="relative flex flex-col justify-center overflow-hidden bg-[#f8f8fb] px-5 py-14 sm:px-10 sm:py-16">

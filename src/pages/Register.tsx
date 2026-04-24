@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { CustomButton } from '../components/Button'
+import { useCreateUsuarioMutation } from '@/hooks/useUsuarios'
 import { showNotification } from '../lib/notifications'
+import { mensajeRespuestaUsuario } from '@/lib/respuesta-api'
+import { ConfirmacionDialog } from '@/components/ConfirmacionDialog'
 
 export function Register() {
   const navigate = useNavigate()
+  const createUsuarioMutation = useCreateUsuarioMutation()
   const [form, setForm] = useState({
     nombre: '',
     email: '',
@@ -13,73 +17,99 @@ export function Register() {
   })
   const [created, setCreated] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!form.nombre || !form.email || !form.password) {
+      showNotification({
+        title: 'Registro incompleto',
+        message: 'Completa todos los campos para crear tu cuenta.',
+        variant: 'warning',
+      })
+      return
+    }
+    setConfirmOpen(true)
+  }
+
+  const handleConfirmRegister = async () => {
+    try {
+      const response = await createUsuarioMutation.mutateAsync({
+        Username: form.nombre.trim(),
+        Correo: form.email.trim(),
+        Contrasena: form.password,
+      })
+      const { ok, mensaje } = mensajeRespuestaUsuario(response)
+      if (!ok) {
+        setConfirmOpen(false)
+        showNotification({
+          title: 'Registro',
+          message: mensaje || 'No fue posible crear la cuenta.',
+          variant: 'warning',
+        })
+        return
+      }
+      setConfirmOpen(false)
+      setCreated(true)
+      showNotification({
+        title: 'Cuenta creada',
+        message: mensaje || 'Tu cuenta de cliente fue creada correctamente.',
+        variant: 'success',
+      })
+    } catch (error) {
+      setConfirmOpen(false)
+      showNotification({
+        title: 'Registro',
+        message: error instanceof Error ? error.message : 'Error al crear la cuenta.',
+        variant: 'error',
+      })
+    }
+  }
 
   const completion = [form.nombre, form.email, form.password].filter(Boolean).length
   const completionPct = `${Math.round((completion / 3) * 100)}%`
 
   return (
-    <main className="grid min-h-svh w-full bg-[#f4f4f5] text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-      <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#111215] p-10 text-zinc-100 sm:p-12 lg:flex lg:border-r lg:border-white/10 lg:shadow-[inset_-1px_0_0_rgba(255,255,255,0.06)]">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(10,10,12,0.96)_0%,rgba(22,23,28,0.92)_42%,rgba(10,10,12,0.96)_100%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_70%_at_10%_10%,rgba(59,130,246,0.2),transparent_60%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_60%_at_100%_100%,rgba(59,130,246,0.18),transparent_60%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute right-[-11%] top-[-9%] h-[58%] w-[22%] rotate-12 rounded-full bg-[repeating-linear-gradient(180deg,rgba(239,68,68,0.9)_0_16px,rgba(255,255,255,0.92)_16px_32px,rgba(37,99,235,0.9)_32px_48px)] opacity-20 blur-[1px]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-[-17%] left-[-8%] h-[60%] w-[20%] -rotate-15 rounded-full bg-[repeating-linear-gradient(180deg,rgba(239,68,68,0.86)_0_16px,rgba(255,255,255,0.88)_16px_32px,rgba(37,99,235,0.86)_32px_48px)] opacity-15 blur-[2px]"
-          aria-hidden
-        />
+    <main className="login-page login-layout grid min-h-svh w-full text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+      <aside className="login-hero login-hero-redesign relative hidden flex-col overflow-hidden p-10 text-zinc-100 sm:p-12 lg:flex">
+        <div className="login-hero-canvas pointer-events-none absolute inset-0" aria-hidden />
+        <div className="login-floating-card login-floating-card--top" aria-hidden>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-cyan-100/90">Barberia</p>
+          <p className="mt-1 text-lg font-semibold text-white">Sistema pro</p>
+        </div>
+        <div className="login-floating-card login-floating-card--bottom" aria-hidden>
+          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-blue-100/90">Operativo</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">Agenda + Clientes + Caja</p>
+        </div>
+        <div className="login-floating-card login-floating-card--mid login-floating-card--mini" aria-hidden>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.15em] text-cyan-100/85">Cuenta</p>
+          <p className="mt-1 text-sm font-medium text-white">Alta en minutos</p>
+        </div>
+        <div className="login-floating-card login-floating-card--left login-floating-card--mini" aria-hidden>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.15em] text-blue-100/85">Inicio</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">Todo en una vista</p>
+        </div>
 
-        <div className="relative z-10 max-w-lg space-y-5">
-          <span className="inline-flex rounded-full border border-blue-300/35 bg-blue-400/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-blue-200">
-            Barber Suite
+        <div className="relative z-10 max-w-xl space-y-5">
+          <span className="login-kicker inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-[0.69rem] font-semibold uppercase tracking-[0.2em] text-cyan-100">
+            Barber Shop
           </span>
-          <h2 className="text-balance text-[1.65rem] font-semibold leading-[1.2] tracking-[-0.02em] text-white sm:text-3xl lg:text-[2.125rem]">
-            BarberShop Manager
+          <h2 className="text-balance text-[1.8rem] font-semibold leading-[1.12] tracking-[-0.02em] text-white sm:text-[2.15rem] lg:text-[2.45rem]">
+            Crea tu cuenta de cliente
           </h2>
-          <p className="max-w-prose text-[0.9375rem] leading-relaxed text-zinc-300">
-            Controla citas, barberos y clientes en una sola plataforma.
-            Diseñado para barberías que cuidan cada detalle del servicio.
+          <p className="login-hero-description max-w-md text-sm text-slate-300/90">
+            Registra tus datos y empieza a reservar citas con una experiencia rapida y profesional.
           </p>
         </div>
 
-        <ul
-          className="login-feature-list relative z-10 mt-14 max-w-lg space-y-4 text-[0.9375rem] leading-snug"
-          aria-label="Capacidades principales"
-        >
-          {[
-            'Agenda diaria con disponibilidad en tiempo real',
-            'Historial de clientes y servicios por barbero',
-            'Gestión de caja, turnos y productividad del equipo',
-          ].map((label) => (
-            <li
-              key={label}
-              className="flex gap-3.5 text-zinc-200 transition-[opacity,transform] duration-300 ease-out hover:translate-x-0.5 hover:opacity-95"
-            >
-              <span
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-300 shadow-[0_0_0_1px_rgba(191,219,254,0.45)] transition-opacity duration-300"
-                aria-hidden
-              />
-              <span>{label}</span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="relative z-10 mt-auto max-w-md pt-14 text-[0.6875rem] leading-relaxed text-zinc-400">
-          Acceso exclusivo para personal autorizado. Si olvidaste tus
-          credenciales, consulta con el administrador del local.
-        </p>
+        <div className="login-hero-metrics relative z-10 mt-auto max-w-xl" aria-label="Beneficios de registro">
+          <div className="login-hero-metric">
+            <span>Registro guiado paso a paso</span>
+          </div>
+          <div className="login-hero-metric">
+            <span>Acceso inmediato al sistema</span>
+          </div>
+        </div>
       </aside>
 
       <section className="relative flex flex-col justify-center overflow-hidden bg-[#f8f8fb] px-5 py-14 sm:px-10 sm:py-16">
@@ -117,21 +147,7 @@ export function Register() {
         <form
           className="mt-5 grid gap-4 sm:grid-cols-2"
           onSubmit={(event) => {
-            event.preventDefault()
-            if (!form.nombre || !form.email || !form.password) {
-              showNotification({
-                title: 'Registro incompleto',
-                message: 'Completa todos los campos para crear tu cuenta.',
-                variant: 'warning',
-              })
-              return
-            }
-            setCreated(true)
-            showNotification({
-              title: 'Cuenta creada',
-              message: 'Tu cuenta de cliente fue creada correctamente.',
-              variant: 'success',
-            })
+            void handleSubmit(event)
           }}
         >
           <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600 sm:col-span-2">
@@ -186,8 +202,9 @@ export function Register() {
             variant="primary"
             size="lg"
             className="sm:col-span-2 w-full rounded-xl"
+            disabled={createUsuarioMutation.isPending}
           >
-            Registrarme
+            {createUsuarioMutation.isPending ? 'Registrando...' : 'Registrarme'}
           </CustomButton>
         </form>
 
@@ -207,6 +224,29 @@ export function Register() {
         </div>
         </div>
       </section>
+      <ConfirmacionDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => void handleConfirmRegister()}
+        title="Confirmar registro"
+        subtitle="Verifica tus datos antes de crear la cuenta"
+        message="¿Deseas crear tu cuenta de cliente con la información capturada?"
+        confirmText="Sí, crear cuenta"
+        cancelText="Revisar datos"
+        loading={createUsuarioMutation.isPending}
+        additionalInfo={
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nombre:</span>
+              <span className="text-sm font-medium text-slate-900">{form.nombre.trim() || '—'}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Correo:</span>
+              <span className="text-sm font-medium text-slate-900">{form.email.trim() || '—'}</span>
+            </div>
+          </div>
+        }
+      />
     </main>
   )
 }

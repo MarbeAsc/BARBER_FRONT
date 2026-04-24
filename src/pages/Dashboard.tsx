@@ -115,14 +115,9 @@ export function Dashboard() {
         onClick: () => navigate('/mis-citas'),
       },
       {
-        label: 'Ver servicios asignados',
+        label: 'Ver promociones',
         variant: 'secondary',
-        onClick: () =>
-          showNotification({
-            title: 'Módulo en preparación',
-            message: 'La vista de servicios asignados estará disponible pronto.',
-            variant: 'info',
-          }),
+        onClick: () => navigate('/promociones-barbero'),
       },
       {
         label: 'Historial del día',

@@ -49,6 +49,7 @@ const navItemsByRole: Record<UserRole, NavItem[]> = {
   Barbero: [
     { to: '/', label: 'Panel general', icon: FaHome },
     { to: '/mis-citas', label: 'Mis citas', icon: FaCalendarAlt },
+    { to: '/promociones-barbero', label: 'Promociones', icon: FaTag },
   ],
   Cliente: [
     { to: '/', label: 'Panel general', icon: FaHome },

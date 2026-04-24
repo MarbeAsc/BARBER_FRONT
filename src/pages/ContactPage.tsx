@@ -1,15 +1,68 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { FaClock, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { CustomButton } from '../components/Button'
 import { showNotification } from '../lib/notifications'
+import { useCreateContactoMutation } from '@/hooks/useContactos'
+import { mensajePrimeraRespuestaLista } from '@/lib/respuesta-api'
+import { ConfirmacionDialog } from '@/components/ConfirmacionDialog'
 
 export function ContactPage() {
+  const createContactoMutation = useCreateContactoMutation()
   const [form, setForm] = useState({
     nombre: '',
     correo: '',
     mensaje: '',
   })
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!form.nombre || !form.correo || !form.mensaje) {
+      showNotification({
+        title: 'Formulario incompleto',
+        message: 'Completa nombre, correo y mensaje para enviarnos tu consulta.',
+        variant: 'warning',
+      })
+      return
+    }
+    setConfirmOpen(true)
+  }
+
+  const handleConfirmSubmit = async () => {
+    try {
+      const response = await createContactoMutation.mutateAsync({
+        nombre: form.nombre.trim(),
+        correo: form.correo.trim(),
+        mensaje: form.mensaje.trim(),
+      })
+      const { ok, mensaje } = mensajePrimeraRespuestaLista(response)
+      if (!ok) {
+        setConfirmOpen(false)
+        showNotification({
+          title: 'Contacto',
+          message: mensaje || 'No se pudo enviar tu consulta.',
+          variant: 'warning',
+        })
+        return
+      }
+
+      setConfirmOpen(false)
+      showNotification({
+        title: 'Mensaje enviado',
+        message: mensaje || 'Gracias por contactarnos. Te responderemos pronto.',
+        variant: 'success',
+      })
+      setForm({ nombre: '', correo: '', mensaje: '' })
+    } catch (error) {
+      setConfirmOpen(false)
+      showNotification({
+        title: 'Contacto',
+        message: error instanceof Error ? error.message : 'Error al enviar la consulta.',
+        variant: 'error',
+      })
+    }
+  }
 
   return (
     <main className="login-page login-layout grid min-h-svh w-full text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
@@ -65,25 +118,25 @@ export function ContactPage() {
               <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <FaEnvelope className="text-blue-600" /> Correo
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">soporte@barbershop.com</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">soporte.tejupilco@barbershop.com</p>
             </article>
             <article className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
               <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <FaPhoneAlt className="text-blue-600" /> Teléfono
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">+593 99 123 4567</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">+52 724 267 1845</p>
             </article>
             <article className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
               <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <FaWhatsapp className="text-blue-600" /> WhatsApp
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">+593 98 765 4321</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">+52 724 112 9036</p>
             </article>
             <article className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
               <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                 <FaClock className="text-blue-600" /> Horario
               </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">Lun - Sáb: 09:00 a 20:00</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">Lun - Sáb: 09:00 a 19:30</p>
             </article>
           </div>
 
@@ -91,27 +144,13 @@ export function ContactPage() {
             <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
               <FaMapMarkerAlt className="text-blue-600" /> Dirección
             </p>
-            <p className="mt-1 text-sm text-slate-700">Av. Principal 123 y Calle Barber, Quito - Ecuador</p>
+            <p className="mt-1 text-sm text-slate-700">Calle Benito Juárez 45, Centro, Tejupilco de Hidalgo, Estado de México</p>
           </div>
 
           <form
             className="mt-6 grid gap-3 sm:grid-cols-2"
             onSubmit={(event) => {
-              event.preventDefault()
-              if (!form.nombre || !form.correo || !form.mensaje) {
-                showNotification({
-                  title: 'Formulario incompleto',
-                  message: 'Completa nombre, correo y mensaje para enviarnos tu consulta.',
-                  variant: 'warning',
-                })
-                return
-              }
-              showNotification({
-                title: 'Mensaje enviado',
-                message: 'Gracias por contactarnos. Te responderemos pronto.',
-                variant: 'success',
-              })
-              setForm({ nombre: '', correo: '', mensaje: '' })
+              void handleSubmit(event)
             }}
           >
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
@@ -149,8 +188,9 @@ export function ContactPage() {
               variant="primary"
               size="lg"
               className="sm:col-span-2 rounded-xl"
+              disabled={createContactoMutation.isPending}
             >
-              Enviar consulta
+              {createContactoMutation.isPending ? 'Enviando...' : 'Enviar consulta'}
             </CustomButton>
           </form>
 
@@ -161,6 +201,33 @@ export function ContactPage() {
           </div>
         </div>
       </section>
+      <ConfirmacionDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => void handleConfirmSubmit()}
+        title="Confirmar consulta"
+        subtitle="Revisa tus datos antes de enviar"
+        message="¿Deseas enviar esta consulta a soporte?"
+        confirmText="Sí, enviar consulta"
+        cancelText="Revisar datos"
+        loading={createContactoMutation.isPending}
+        additionalInfo={
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nombre:</span>
+              <span className="text-sm font-medium text-slate-900">{form.nombre.trim() || '—'}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Correo:</span>
+              <span className="text-sm font-medium text-slate-900">{form.correo.trim() || '—'}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Mensaje:</span>
+              <span className="text-sm font-medium text-slate-900">{form.mensaje.trim() || '—'}</span>
+            </div>
+          </div>
+        }
+      />
     </main>
   )
 }

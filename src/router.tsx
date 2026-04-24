@@ -94,6 +94,13 @@ export const router = createBrowserRouter([
                       return { Component: BarberoCitasPage }
                     },
                   },
+                  {
+                    path: 'promociones-barbero',
+                    lazy: async () => {
+                      const { ClientePromocionesPage } = await import('./pages/cliente/ClientePromocionesPage')
+                      return { Component: ClientePromocionesPage }
+                    },
+                  },
                 ],
               },
               {

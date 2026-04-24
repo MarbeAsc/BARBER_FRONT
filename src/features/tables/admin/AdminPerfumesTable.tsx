@@ -37,15 +37,15 @@ function DisponibleSwitch({
         aria-label={active ? 'Disponible, pulsar para marcar como no disponible' : 'No disponible, pulsar para marcar como disponible'}
         disabled={disabled}
         onClick={() => onToggle(!active)}
-        className={`inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 px-0.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-55 ${
+        className={`inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full border-2 px-0.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-55 ${
           active
             ? 'justify-end border-emerald-400 bg-emerald-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
             : 'justify-start border-slate-300 bg-slate-200 shadow-inner'
         }`}
       >
-        <span className="pointer-events-none block h-[1.1rem] w-[1.1rem] rounded-full bg-white shadow-md" />
+        <span className="pointer-events-none block h-4 w-4 rounded-full bg-white shadow-md" />
       </button>
-      <span className={`min-w-8 text-xs font-bold tracking-wide ${active ? 'text-emerald-700' : 'text-slate-600'}`}>
+      <span className={`min-w-8 text-[11px] font-bold tracking-wide ${active ? 'text-emerald-700' : 'text-slate-600'}`}>
         {active ? 'Sí' : 'No'}
       </span>
     </div>
@@ -180,14 +180,14 @@ export function AdminPerfumesTable({ onEditPerfume }: AdminPerfumesTableProps) {
     enableRowSelection: false,
     positionActionsColumn: 'last',
     initialState: {
-      showColumnFilters: true,
+      showColumnFilters: false,
       showGlobalFilter: true,
       pagination: { pageIndex: 0, pageSize: 5 },
     },
     paginationDisplayMode: 'pages',
     displayColumnDefOptions: { 'mrt-row-actions': { header: 'Acciones', size: 140 } },
     renderTopToolbarCustomActions: () => (
-      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+      <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
         Datos desde obtenerPerfumes (PerfumeDTO)
       </span>
     ),
@@ -199,7 +199,7 @@ export function AdminPerfumesTable({ onEditPerfume }: AdminPerfumesTableProps) {
           iconOnly
           tooltip="Editar"
           aria-label="Editar"
-          className="rounded-xl border border-blue-200 bg-blue-50/70 text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-100"
+          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50/70 hover:text-blue-700"
           onClick={() =>
             onEditPerfume
               ? onEditPerfume(row.original)
@@ -219,7 +219,7 @@ export function AdminPerfumesTable({ onEditPerfume }: AdminPerfumesTableProps) {
           tooltip="Eliminar"
           aria-label="Eliminar"
           disabled={deletePerfume.isPending}
-          className="rounded-xl border border-rose-200 bg-rose-50/80 text-rose-700 shadow-sm hover:border-rose-300 hover:bg-rose-100"
+          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50/70 hover:text-rose-700"
           onClick={() => setDeleteTarget(row.original)}
         >
           <FaTrashAlt className="h-3.5 w-3.5" />
@@ -235,22 +235,22 @@ export function AdminPerfumesTable({ onEditPerfume }: AdminPerfumesTableProps) {
       rowsPerPage: 'Filas por pagina',
       of: 'de',
     },
-    muiTablePaperProps: { elevation: 0, sx: { border: '1px solid #dbe4f0', borderRadius: '0.9rem', overflow: 'hidden' } },
-    muiTopToolbarProps: { sx: { background: 'linear-gradient(90deg, rgba(239,246,255,0.7) 0%, rgba(248,250,252,0.7) 100%)', borderBottom: '1px solid #e2e8f0', px: '0.75rem' } },
-    muiTableHeadCellProps: { sx: { backgroundColor: '#f8fafc', color: '#334155', fontWeight: 700, fontSize: '0.74rem', borderBottom: '1px solid #e2e8f0' } },
-    muiTableBodyRowProps: ({ row }) => ({ sx: { backgroundColor: row.index % 2 === 0 ? '#ffffff' : '#f8fafc', '&:hover td': { backgroundColor: '#eff6ff' } } }),
+    muiTablePaperProps: { elevation: 0, sx: { border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 16px 35px -28px rgba(59, 130, 246, 0.45)' } },
+    muiTopToolbarProps: { sx: { background: 'linear-gradient(90deg, rgba(238,242,255,0.88) 0%, rgba(255,255,255,0.95) 60%, rgba(241,245,249,0.9) 100%)', borderBottom: '1px solid #e2e8f0', px: '0.9rem', py: '0.4rem', minHeight: '3.2rem' } },
+    muiTableHeadCellProps: { sx: { backgroundColor: '#eef2ff', color: '#1e293b', fontWeight: 700, fontSize: '0.75rem', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 2 } },
+    muiTableBodyRowProps: ({ row }) => ({ sx: { backgroundColor: row.index % 2 === 0 ? '#ffffff' : '#f8fafc', transition: 'all .18s ease', '&:hover td': { backgroundColor: '#e9efff' }, '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 18px -16px rgba(79,70,229,.8)' } } }),
     muiTableBodyCellProps: { sx: { borderBottom: '1px solid #e2e8f0', fontSize: '0.835rem' } },
     muiSearchTextFieldProps: {
       placeholder: 'Buscar por id, nombre, descripción...',
       size: 'small',
-      sx: { minWidth: '300px', '& .MuiOutlinedInput-root': { borderRadius: '12px', backgroundColor: '#ffffff' } },
+      sx: { minWidth: '300px', '& .MuiOutlinedInput-root': { borderRadius: '999px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 0 rgba(15,23,42,.02)' } },
     },
-    muiPaginationProps: { rowsPerPageOptions: [5, 10, 20], showFirstButton: true, showLastButton: true },
+    muiPaginationProps: { rowsPerPageOptions: [5, 10, 20], showFirstButton: true, showLastButton: true, sx: { '& .MuiButtonBase-root.Mui-selected': { backgroundColor: '#1d4ed8', color: '#ffffff' } } },
   })
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 bg-linear-to-br from-slate-50 to-white px-5 py-4">
+    <section className="rounded-3xl border border-slate-200/80 bg-linear-to-br from-white via-white to-indigo-50/20 shadow-sm shadow-blue-100/40">
+      <div className="border-b border-slate-200 bg-linear-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-4">
         <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">Perfumes registrados</h2>
         <p className="mt-1 text-xs text-slate-500 sm:text-sm">Listado según PerfumeDTO: id, nombre, descripción, base64 e indicador disponible.</p>
         {isError ? (
@@ -261,20 +261,20 @@ export function AdminPerfumesTable({ onEditPerfume }: AdminPerfumesTableProps) {
             </CustomButton>
           </div>
         ) : null}
-        <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm">
           <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
             <span className="text-slate-500">Resumen</span>
             <span className="text-slate-700">{data.length} registros</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-emerald-500"
+              className="h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-blue-600"
               style={{ width: `${data.length ? (disponiblesCount / data.length) * 100 : 0}%` }}
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">Disponible (true): {disponiblesCount}</span>
-            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-blue-700">Otros: {otrosCount}</span>
+            <span className="rounded-full bg-blue-50/80 px-2.5 py-1 text-blue-600">Disponible (true): {disponiblesCount}</span>
+            <span className="rounded-full bg-indigo-50/80 px-2.5 py-1 text-indigo-600">Otros: {otrosCount}</span>
           </div>
         </div>
       </div>

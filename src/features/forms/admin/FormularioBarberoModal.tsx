@@ -121,37 +121,38 @@ export function FormularioBarberoModal({
 
   return (
     <Fragment>
-    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
-      <section className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5 backdrop-blur">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Administrador</p>
-            <h2 className="text-lg font-semibold text-slate-900">{modoEdicion ? 'Editar barbero' : 'Nuevo barbero'}</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{modoEdicion ? 'Editar barbero' : 'Nuevo barbero'}</h2>
           </div>
           <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={handleClose} aria-label="Cerrar modal">
             <FaTimes className="h-4 w-4" />
           </CustomButton>
         </header>
 
-        <form className="space-y-4 p-5" onSubmit={handleSubmit}>
+        <form className="space-y-5 p-6" onSubmit={handleSubmit}>
           {modoEdicion && barbero ? (
             <p className="text-xs text-slate-500">
               Usuario asociado: <span className="font-semibold text-slate-800">{barbero.nombreUsuario}</span>
             </p>
           ) : null}
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Nombre
             <input
               type="text"
               required
               value={form.nombre}
               onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+              placeholder="Ej. Juan Pérez"
+              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Usuario
             <select
               required
@@ -160,7 +161,7 @@ export function FormularioBarberoModal({
                 setForm((f) => ({ ...f, idUsuario: e.target.value ? Number(e.target.value) : 0 }))
               }
               disabled={modoEdicion || usuariosLoading}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               <option value="">
                 {usuariosLoading ? 'Cargando usuarios…' : 'Selecciona un usuario…'}
@@ -191,13 +192,14 @@ export function FormularioBarberoModal({
             <p className="text-[11px] text-slate-500">El usuario asociado no se modifica desde este formulario.</p>
           ) : null}
 
-          <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
-            <CustomButton type="button" variant="secondary" onClick={handleClose} disabled={isPending}>
+          <div className="flex justify-end gap-2 border-t border-indigo-100/80 pt-5">
+            <CustomButton type="button" variant="ghost" onClick={handleClose} disabled={isPending}>
               Cancelar
             </CustomButton>
             <CustomButton
               type="submit"
               variant="primary"
+              className="bg-blue-600 text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"
               disabled={
                 isPending ||
                 confirmGuardarOpen ||

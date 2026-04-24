@@ -1,5 +1,10 @@
 import { useAuth } from '@/hooks/useAuthContext'
+import { useBarberosListQuery } from '@/hooks/useBarberos'
 import { useMemo } from 'react'
+import { usePromocionesListQuery } from '@/hooks/usePromociones'
+import { useServiciosQuery } from '@/hooks/useServicios'
+import { useUsuariosListQuery } from '@/hooks/useUsuarios'
+import { FaArrowRight, FaBullhorn, FaRegCalendarCheck } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { CustomButton } from '../components/Button'
 import { inferRoleFromEmail, roleLabel, type UserRole } from '../lib/roles'
@@ -20,6 +25,28 @@ type Appointment = {
   statusClass: string
 }
 
+function toDate(value: string | Date): Date {
+  return value instanceof Date ? value : new Date(value)
+}
+
+function formatDate(value: string | Date): string {
+  const date = toDate(value)
+  if (Number.isNaN(date.getTime())) return 'Sin fecha'
+  return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(date)
+}
+
+function daysUntil(value: string | Date): number {
+  const date = toDate(value)
+  if (Number.isNaN(date.getTime())) return Number.POSITIVE_INFINITY
+  const diff = date.getTime() - Date.now()
+  return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+function parseMetricValue(value: string): number {
+  const parsed = Number.parseFloat(value.replace(',', '.'))
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
 export function Dashboard() {
   const { username } = useAuth()
   const navigate = useNavigate()
@@ -27,6 +54,38 @@ export function Dashboard() {
     () => username?.role ?? inferRoleFromEmail(username?.email ?? ''),
     [username?.role, username?.email],
   )
+  const isAdmin = selectedRole === 'Administrador'
+  const isCliente = selectedRole === 'Cliente'
+  const { data: promociones = [] } = usePromocionesListQuery({ enabled: isCliente || isAdmin })
+  const { data: servicios = [] } = useServiciosQuery({ enabled: isAdmin })
+  const { data: barberos = [] } = useBarberosListQuery({ enabled: isAdmin })
+  const { data: usuarios = [] } = useUsuariosListQuery({ enabled: isAdmin })
+
+  const promocionesVigentesAll = useMemo(() => {
+    const now = new Date()
+    return promociones.filter((promo) => {
+      const inicio = toDate(promo.fechaInicio)
+      const fin = toDate(promo.fechaFin)
+      return !Number.isNaN(inicio.getTime()) && !Number.isNaN(fin.getTime()) && now >= inicio && now <= fin
+    })
+  }, [promociones])
+
+  const promocionesVigentes = useMemo(() => promocionesVigentesAll.slice(0, 4), [promocionesVigentesAll])
+  const promocionesPorVencer = useMemo(
+    () => promocionesVigentesAll.filter((promo) => daysUntil(promo.fechaFin) <= 3).length,
+    [promocionesVigentesAll],
+  )
+  const promocionesNuevas = useMemo(
+    () => promocionesVigentesAll.filter((promo) => daysUntil(promo.fechaInicio) >= -2).length,
+    [promocionesVigentesAll],
+  )
+  const terminaHoy = useMemo(
+    () => promocionesVigentesAll.filter((promo) => daysUntil(promo.fechaFin) <= 0).length,
+    [promocionesVigentesAll],
+  )
+  const serviciosActivos = useMemo(() => servicios.filter((servicio) => Number(servicio.estatus) === 1).length, [servicios])
+  const barberosActivos = useMemo(() => barberos.filter((barbero) => Number(barbero.estatus) === 1).length, [barberos])
+  const usuariosActivos = useMemo(() => usuarios.filter((usuario) => Number(usuario.Estatus) === 1).length, [usuarios])
 
   const quickActionsByRole: Record<
     UserRole,
@@ -87,25 +146,16 @@ export function Dashboard() {
         variant: 'secondary',
         onClick: () => navigate('/mis-reservas'),
       },
-      {
-        label: 'Reprogramar cita',
-        variant: 'secondary',
-        onClick: () =>
-          showNotification({
-            title: 'Acción pendiente',
-            message: 'La reprogramación estará disponible en el próximo módulo.',
-            variant: 'warning',
-          }),
-      },
+      
     ],
   }
 
   const kpisByRole: Record<UserRole, Kpi[]> = {
     Administrador: [
-      { label: 'Servicios activos', value: '18', delta: '3 con extras nuevos' },
-      { label: 'Barberos registrados', value: '6', delta: '1 disponible hoy' },
-      { label: 'Citas del dia', value: '32', delta: '+14% vs. ayer' },
-      { label: 'Ingresos estimados', value: '$1,280', delta: 'Ticket prom. $41' },
+      { label: 'Servicios activos', value: String(serviciosActivos), delta: `${servicios.length} registrados` },
+      { label: 'Barberos activos', value: String(barberosActivos), delta: `${barberos.length} registrados` },
+      { label: 'Usuarios activos', value: String(usuariosActivos), delta: `${usuarios.length} en total` },
+      { label: 'Promociones vigentes', value: String(promocionesVigentesAll.length), delta: `${promocionesPorVencer} por vencer` },
     ],
     Barbero: [
       { label: 'Mis citas hoy', value: '8', delta: '2 en curso' },
@@ -114,12 +164,36 @@ export function Dashboard() {
       { label: 'Disponibilidad', value: '2 hrs', delta: 'Huecos entre 14:00 y 16:00' },
     ],
     Cliente: [
-      { label: 'Mis reservas', value: '2', delta: '1 para esta semana' },
-      { label: 'Servicios favoritos', value: '3', delta: 'Corte clasico top' },
-      { label: 'Barberos sugeridos', value: '4', delta: 'Segun tu historial' },
-      { label: 'Disponibilidad', value: 'Hoy', delta: 'Slots desde 15:30' },
+      { label: 'Promociones activas', value: String(promocionesVigentesAll.length), delta: 'Disponibles ahora' },
+      { label: 'Por vencer', value: String(promocionesPorVencer), delta: 'Terminan en menos de 3 días' },
+      { label: 'Nuevas', value: String(promocionesNuevas), delta: 'Publicadas recientemente' },
+      { label: 'Terminan hoy', value: String(terminaHoy), delta: 'Aprovéchalas hoy' },
     ],
   }
+
+  const kpiActionsByRole: Record<UserRole, Array<() => void>> = {
+    Administrador: [
+      () => navigate('/servicios'),
+      () => navigate('/barberos'),
+      () => navigate('/usuarios'),
+      () => navigate('/promociones'),
+    ],
+    Barbero: [
+      () => navigate('/mis-citas'),
+      () => navigate('/mis-citas'),
+      () => navigate('/mis-citas'),
+      () => navigate('/mis-citas'),
+    ],
+    Cliente: [
+      () => navigate('/promociones-cliente'),
+      () => navigate('/promociones-cliente'),
+      () => navigate('/promociones-cliente'),
+      () => navigate('/mis-reservas'),
+    ],
+  }
+
+  const kpisForRole = kpisByRole[selectedRole]
+  const kpiMaxValue = Math.max(1, ...kpisForRole.map((kpi) => parseMetricValue(kpi.value)))
 
   const appointmentsByRole: Record<UserRole, Appointment[]> = {
     Administrador: [
@@ -211,18 +285,18 @@ export function Dashboard() {
   }
 
   return (
-    <div className="w-full min-w-0 bg-white">
-      <main className="mx-auto px-4 py-8 text-slate-700 sm:px-6 lg:px-8 lg:py-10">
-        <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="w-full min-w-0 bg-linear-to-b from-slate-50 via-white to-indigo-50/30">
+      <main className="mx-auto max-w-7xl px-4 py-8 text-slate-700 sm:px-6 lg:px-8 lg:py-10">
+        <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm shadow-blue-100/40 backdrop-blur">
           <div className="group relative">
             <img
               src="/logo+.jpg"
               alt="Barbería en acción"
               className="h-56 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] sm:h-72 lg:h-80"
             />
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-900/45 via-slate-900/10 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-900/55 via-indigo-900/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-              <p className="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+              <p className="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
                 Estado del sistema
               </p>
               <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
@@ -242,115 +316,222 @@ export function Dashboard() {
           </div>
         </section>
 
-        <div className="mb-8 rounded-2xl border border-blue-100 bg-linear-to-r from-blue-50/70 to-white px-6 py-5">
+        <div className="mb-8 rounded-3xl border border-blue-100/80 bg-linear-to-r from-blue-50 via-indigo-50/70 to-white px-6 py-5 shadow-sm shadow-blue-100/40">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">
             Resumen del día
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Buen día, {username?.username}
           </h1>
-          <p className="mt-2 text-sm text-slate-500">{username  ?.email}</p>
+          <p className="mt-2 text-sm text-slate-500">{username?.email}</p>
           <p className="mt-1 text-xs font-medium text-blue-700/90">
             Vista activa: {roleLabel(selectedRole)}
           </p>
         </div>
         <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {kpisByRole[selectedRole].map((card) => (
-            <article
+          {kpisForRole.map((card, index) => (
+            <button
               key={card.label}
-              className="group rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+              type="button"
+              onClick={kpiActionsByRole[selectedRole][index]}
+              className="group rounded-2xl border border-slate-200/80 bg-linear-to-br from-white via-white to-indigo-50/40 p-4 text-left shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
             >
-              <span className="mb-3 inline-flex h-1.5 w-9 rounded-full bg-blue-400/80" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <span className="inline-flex h-1.5 w-9 rounded-full bg-linear-to-r from-sky-400 to-indigo-500" />
+                <FaArrowRight className="h-3.5 w-3.5 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-indigo-600" />
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 transition group-hover:text-slate-600">
                 {card.label}
               </p>
-              <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">
+              <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900 transition group-hover:text-indigo-700">
                 {card.value}
               </p>
               <p className="mt-1 text-xs text-slate-500">{card.delta}</p>
-            </article>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100/90">
+                <div
+                  className="h-full rounded-full bg-linear-to-r from-sky-500 to-indigo-600 transition-all duration-500"
+                  style={{ width: `${Math.max(12, Math.min(100, (parseMetricValue(card.value) / kpiMaxValue) * 100))}%` }}
+                />
+              </div>
+            </button>
           ))}
         </section>
 
         <div className="mx-auto grid gap-6 lg:grid-cols-3">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+          <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm shadow-blue-100/40 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h2 className="text-base font-semibold text-slate-900">
-                {selectedRole === 'Administrador' && 'Citas globales de hoy'}
+                {selectedRole === 'Administrador' && 'Estado operativo del sistema'}
                 {selectedRole === 'Barbero' && 'Tus citas programadas'}
-                {selectedRole === 'Cliente' && 'Horarios recomendados'}
+                {selectedRole === 'Cliente' && 'Promociones vigentes'}
               </h2>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                {selectedRole === 'Administrador' && '32 citas programadas'}
+              <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                {selectedRole === 'Administrador' && `${usuariosActivos} usuarios activos`}
                 {selectedRole === 'Barbero' && '4 citas asignadas'}
-                {selectedRole === 'Cliente' && 'Slots disponibles hoy'}
+                {selectedRole === 'Cliente' && `${promocionesVigentes.length} activas`}
               </span>
             </div>
 
-            <div className="space-y-3">
-              {appointmentsByRole[selectedRole].map((item) => (
-                <article
-                  key={`${item.hour}-${item.client}`}
-                  className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 transition-colors hover:border-blue-200 hover:bg-white"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold tracking-tight text-slate-900">
-                        {item.hour}
-                      </p>
-                      <p className="text-sm font-medium text-slate-700">
-                        {item.client}
-                      </p>
-                      <p className="text-xs text-slate-500">{item.service}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-slate-500">Barbero asignado</p>
-                      <p className="text-sm font-semibold text-slate-800">
-                        {item.barber}
-                      </p>
-                      <span
-                        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.statusClass}`}
+            {selectedRole === 'Cliente' ? (
+              promocionesVigentes.length > 0 ? (
+                <div className="space-y-3">
+                  {promocionesVigentes.map((promo) => {
+                    const diasRestantes = daysUntil(promo.fechaFin)
+                    const estadoClass =
+                      diasRestantes <= 1
+                        ? 'bg-rose-100 text-rose-700'
+                        : diasRestantes <= 3
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-emerald-100 text-emerald-700'
+                    const progreso = Math.max(8, Math.min(100, (7 - Math.max(diasRestantes, 0)) * 14))
+                    return (
+                      <article
+                        key={promo.id}
+                        className="group rounded-2xl border border-slate-200/80 bg-linear-to-br from-white via-white to-slate-50 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
                       >
-                        {item.status}
-                      </span>
-                    </div>
-                  </div>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
+                              <FaBullhorn className="h-3 w-3" />
+                              Oferta activa
+                            </span>
+                            <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-slate-900">
+                              {promo.descripcion?.trim() || 'Promoción especial'}
+                            </p>
+                            <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-slate-500">
+                              <FaRegCalendarCheck className="h-3 w-3 text-blue-600" />
+                              Inicio: {formatDate(promo.fechaInicio)}
+                            </p>
+                            <p className="text-xs text-slate-500">Fin: {formatDate(promo.fechaFin)}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Disponibilidad</p>
+                            <span className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${estadoClass}`}>
+                              {diasRestantes <= 0 ? 'Termina hoy' : `Termina en ${diasRestantes} día(s)`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${diasRestantes <= 1 ? 'bg-rose-500' : diasRestantes <= 3 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            style={{ width: `${progreso}%` }}
+                          />
+                        </div>
+                        <div className="mt-3 flex justify-end">
+                          <CustomButton
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="group/btn"
+                            onClick={() => navigate('/promociones-cliente')}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              Ver promociones
+                              <FaArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
+                            </span>
+                          </CustomButton>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              ) : (
+                <article className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600">
+                  No hay promociones vigentes en este momento.
                 </article>
-              ))}
-            </div>
+              )
+            ) : selectedRole === 'Administrador' ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <article className="rounded-xl border border-sky-100 bg-sky-50/60 p-4 transition-colors hover:border-sky-200 hover:bg-white">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Servicios</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-900">{serviciosActivos}</p>
+                  <p className="text-xs text-slate-500">Activos de {servicios.length} registrados</p>
+                </article>
+                <article className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 transition-colors hover:border-indigo-200 hover:bg-white">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Barberos</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-900">{barberosActivos}</p>
+                  <p className="text-xs text-slate-500">Activos de {barberos.length} registrados</p>
+                </article>
+                <article className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 transition-colors hover:border-emerald-200 hover:bg-white">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Usuarios</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-900">{usuariosActivos}</p>
+                  <p className="text-xs text-slate-500">Activos de {usuarios.length} en total</p>
+                </article>
+                <article className="rounded-xl border border-amber-100 bg-amber-50/60 p-4 transition-colors hover:border-amber-200 hover:bg-white">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Promociones</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-900">{promocionesVigentesAll.length}</p>
+                  <p className="text-xs text-slate-500">{promocionesPorVencer} por vencer en 3 días</p>
+                </article>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {appointmentsByRole[selectedRole].map((item) => (
+                  <article
+                    key={`${item.hour}-${item.client}`}
+                    className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 transition-colors hover:border-indigo-200 hover:bg-white"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-lg font-semibold tracking-tight text-slate-900">
+                          {item.hour}
+                        </p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {item.client}
+                        </p>
+                        <p className="text-xs text-slate-500">{item.service}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-slate-500">Barbero asignado</p>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {item.barber}
+                        </p>
+                        <span
+                          className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.statusClass}`}
+                        >
+                          {item.status}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
 
           <aside className="space-y-4">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm shadow-blue-100/40">
               <h3 className="text-sm font-semibold text-slate-900">
                 {selectedRole === 'Administrador' && 'Panel administrativo'}
                 {selectedRole === 'Barbero' && 'Resumen operativo'}
                 {selectedRole === 'Cliente' && 'Tu cuenta'}
               </h3>
               <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
-                {selectedRole === 'Administrador' && '$1,280'}
+                {selectedRole === 'Administrador' && `${usuariosActivos}/${usuarios.length}`}
                 {selectedRole === 'Barbero' && '5/8'}
                 {selectedRole === 'Cliente' && '2'}
               </p>
-              <p className="mt-1 text-xs text-emerald-600">
-                {selectedRole === 'Administrador' && '+8% comparado con ayer'}
+              <p className={`mt-1 text-xs ${selectedRole === 'Administrador' ? 'text-slate-600' : 'text-emerald-600'}`}>
+                {selectedRole === 'Administrador' && 'Usuarios activos / total del sistema'}
                 {selectedRole === 'Barbero' && 'Citas atendidas hoy'}
                 {selectedRole === 'Cliente' && 'Reservas activas'}
               </p>
-                {selectedRole === 'Cliente' && 'Reservas activas'}
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                  <p>{selectedRole === 'Barbero' ? 'Tiempo promedio' : selectedRole === 'Cliente' ? 'Favoritos' : 'Indicador A'}</p>
+                <div className="rounded-lg bg-slate-100/80 p-2.5 text-slate-600">
+                  <p>
+                    {selectedRole === 'Barbero' ? 'Tiempo promedio' : selectedRole === 'Cliente' ? 'Favoritos' : 'Servicios activos'}
+                  </p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === 'Administrador' && '31'}
+                    {selectedRole === 'Administrador' && `${serviciosActivos}`}
                     {selectedRole === 'Barbero' && '42 min'}
                     {selectedRole === 'Cliente' && '3'}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-100 p-2.5 text-slate-600">
-                    <p>{selectedRole === 'Barbero' ? 'Siguiente hueco' : selectedRole === 'Cliente' ? 'Ultimo corte' : 'Indicador B'}</p>
+                <div className="rounded-lg bg-slate-100/80 p-2.5 text-slate-600">
+                  <p>
+                    {selectedRole === 'Barbero' ? 'Siguiente hueco' : selectedRole === 'Cliente' ? 'Ultimo corte' : 'Promos por vencer'}
+                  </p>
                   <p className="text-base font-semibold text-slate-900">
-                    {selectedRole === 'Administrador' && '$41'}
+                    {selectedRole === 'Administrador' && `${promocionesPorVencer}`}
                     {selectedRole === 'Barbero' && '14:00'}
                     {selectedRole === 'Cliente' && 'Hace 12 dias'}
                   </p>
@@ -358,7 +539,7 @@ export function Dashboard() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-5 shadow-sm">
+            <section className="rounded-3xl border border-indigo-200/80 bg-linear-to-br from-indigo-50 via-blue-50 to-white p-5 shadow-sm shadow-indigo-100/40">
               <h3 className="text-sm font-semibold text-slate-900">
                 Acciones rapidas
               </h3>

@@ -170,43 +170,45 @@ export function FormularioServicioModal({
 
   return (
     <Fragment>
-    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
-      <section className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5 backdrop-blur">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Administrador</p>
-            <h2 className="text-lg font-semibold text-slate-900">{modoEdicion ? 'Editar servicio' : 'Nuevo servicio'}</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{modoEdicion ? 'Editar servicio' : 'Nuevo servicio'}</h2>
           </div>
           <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={handleClose} aria-label="Cerrar modal">
             <FaTimes className="h-4 w-4" />
           </CustomButton>
         </header>
 
-        <form className="space-y-4 p-5" onSubmit={(e) => void handleSubmit(e)}>
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        <form className="space-y-5 p-6" onSubmit={(e) => void handleSubmit(e)}>
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Nombre
             <input
               type="text"
               required
               value={form.nombre}
               onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+              placeholder="Ej. Corte clásico"
+              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Descripción
             <textarea
               value={form.descripcion ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))}
               rows={3}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+              placeholder="Describe brevemente en qué consiste el servicio"
+              className="rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-              ID tipo
+            <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+              ID tipo (opcional)
               <input
                 type="number"
                 value={form.idTipo ?? ''}
@@ -215,31 +217,37 @@ export function FormularioServicioModal({
                   setForm((f) => ({ ...f, idTipo: v === '' ? null : Number(v) }))
                 }}
                 placeholder="Opcional"
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+                className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               />
             </label>
-            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+            <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
               Precio base (MXN)
-              <input
-                type="number"
-                required
-                min={0}
-                step={0.01}
-                value={form.precioBase}
-                onChange={(e) => setForm((f) => ({ ...f, precioBase: Number(e.target.value) }))}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
-              />
+              <div className="flex h-11 items-center rounded-xl border border-slate-300 bg-white pr-2 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100">
+                <span className="rounded-l-xl bg-indigo-50 px-3 text-sm font-semibold text-indigo-700">MXN $</span>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  step={0.01}
+                  value={form.precioBase}
+                  onChange={(e) => setForm((f) => ({ ...f, precioBase: Number(e.target.value) }))}
+                  className="h-full w-full rounded-r-xl border-0 px-0 text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                />
+              </div>
             </label>
           </div>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Imagen (opcional)
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleArchivoChange}
-              className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-700"
-            />
+            <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 px-3.5 py-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleArchivoChange}
+                className="w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-100 file:px-3.5 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+              />
+              <p className="mt-2 text-xs font-medium text-slate-500">Arrastra o selecciona una imagen para este servicio.</p>
+            </div>
           </label>
           {previewSrc ? (
             <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -248,11 +256,16 @@ export function FormularioServicioModal({
             </div>
           ) : null}
 
-          <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
-            <CustomButton type="button" variant="secondary" onClick={handleClose} disabled={isPending}>
+          <div className="flex justify-end gap-2 border-t border-indigo-100/80 pt-5">
+            <CustomButton type="button" variant="ghost" onClick={handleClose} disabled={isPending}>
               Cancelar
             </CustomButton>
-            <CustomButton type="submit" variant="primary" disabled={isPending || confirmGuardarOpen}>
+            <CustomButton
+              type="submit"
+              variant="primary"
+              disabled={isPending || confirmGuardarOpen}
+              className="bg-blue-600 text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"
+            >
               {modoEdicion ? 'Actualizar' : 'Guardar'}
             </CustomButton>
           </div>

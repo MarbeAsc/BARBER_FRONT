@@ -131,62 +131,72 @@ export function FormularioAnadidoModal({
 
   return (
     <Fragment>
-    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm">
-      <section className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5 backdrop-blur">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Administrador</p>
-            <h2 className="text-lg font-semibold text-slate-900">{modoEdicion ? 'Editar añadido' : 'Nuevo añadido'}</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{modoEdicion ? 'Editar añadido' : 'Nuevo añadido'}</h2>
           </div>
           <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={handleClose} aria-label="Cerrar modal">
             <FaTimes className="h-4 w-4" />
           </CustomButton>
         </header>
 
-        <form className="space-y-4 p-5" onSubmit={handleSubmit}>
-          <p className="text-xs text-slate-500">
+        <form className="space-y-5 p-6" onSubmit={handleSubmit}>
+          <p className="rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2 text-xs text-slate-600">
             Servicio base: <span className="font-semibold text-slate-800">{servicioBaseId > 0 ? servicioBaseId : '—'}</span>
           </p>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Nombre
             <input
               type="text"
               required
               value={form.nombre}
               onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+              placeholder="Ej. Toalla caliente"
+              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Descripción
             <textarea
               value={form.descripcion ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value || null }))}
               rows={3}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+              placeholder="Detalle breve del añadido"
+              className="rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
           </label>
 
-          <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Precio extra (MXN)
-            <input
-              type="number"
-              required
-              min={0}
-              step={0.01}
-              value={form.precio}
-              onChange={(e) => setForm((f) => ({ ...f, precio: Number(e.target.value) }))}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
-            />
+            <div className="flex h-11 items-center rounded-xl border border-slate-300 bg-white pr-2 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100">
+              <span className="rounded-l-xl bg-indigo-50 px-3 text-sm font-semibold text-indigo-700">MXN $</span>
+              <input
+                type="number"
+                required
+                min={0}
+                step={0.01}
+                value={form.precio}
+                onChange={(e) => setForm((f) => ({ ...f, precio: Number(e.target.value) }))}
+                className="h-full w-full rounded-r-xl border-0 px-0 text-sm text-slate-700 outline-none"
+              />
+            </div>
           </label>
 
-          <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
-            <CustomButton type="button" variant="secondary" onClick={handleClose} disabled={isPending}>
+          <div className="flex justify-end gap-2 border-t border-indigo-100/80 pt-5">
+            <CustomButton type="button" variant="ghost" onClick={handleClose} disabled={isPending}>
               Cancelar
             </CustomButton>
-            <CustomButton type="submit" variant="primary" disabled={isPending || confirmGuardarOpen}>
+            <CustomButton
+              type="submit"
+              variant="primary"
+              className="bg-blue-600 text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"
+              disabled={isPending || confirmGuardarOpen}
+            >
               {modoEdicion ? 'Actualizar' : 'Guardar'}
             </CustomButton>
           </div>

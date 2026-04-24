@@ -56,7 +56,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
     enableRowSelection: false,
     positionActionsColumn: 'last',
     initialState: {
-      showColumnFilters: true,
+      showColumnFilters: false,
       showGlobalFilter: true,
       pagination: { pageIndex: 0, pageSize: 5 },
     },
@@ -68,7 +68,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
       },
     },
     renderTopToolbarCustomActions: () => (
-      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+      <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700">
         Tip: usa filtros para encontrar
       </span>
     ),
@@ -80,7 +80,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
           iconOnly
           tooltip="Editar"
           aria-label="Editar"
-          className="rounded-xl border border-blue-200 bg-blue-50/70 text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-100"
+          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50/70 hover:text-blue-700"
           onClick={() => onEdit?.(row.original)}
         >
           <FaPen className="h-3.5 w-3.5" />
@@ -91,7 +91,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
           iconOnly
           tooltip="Eliminar"
           aria-label="Eliminar"
-          className="rounded-xl border border-rose-200 bg-rose-50/80 text-rose-700 shadow-sm hover:border-rose-300 hover:bg-rose-100"
+          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50/70 hover:text-rose-700"
           onClick={() => onDelete?.(row.original)}
         >
           <FaTrashAlt className="h-3.5 w-3.5" />
@@ -110,34 +110,39 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
     muiTablePaperProps: {
       elevation: 0,
       sx: {
-        border: '1px solid #dbe4f0',
-        borderRadius: '0.9rem',
+        border: '1px solid #e2e8f0',
+        borderRadius: '1rem',
         overflow: 'hidden',
-        boxShadow: '0 8px 28px -20px rgba(37, 99, 235, 0.35)',
+        boxShadow: '0 16px 35px -28px rgba(59, 130, 246, 0.45)',
       },
     },
     muiTopToolbarProps: {
       sx: {
-        background: 'linear-gradient(90deg, rgba(239,246,255,0.7) 0%, rgba(248,250,252,0.7) 100%)',
+        background: 'linear-gradient(90deg, rgba(238,242,255,0.88) 0%, rgba(255,255,255,0.95) 60%, rgba(241,245,249,0.9) 100%)',
         borderBottom: '1px solid #e2e8f0',
-        px: '0.75rem',
+        px: '0.9rem',
+        py: '0.4rem',
+        minHeight: '3.2rem',
       },
     },
     muiTableHeadCellProps: {
       sx: {
-        backgroundColor: '#f8fafc',
-        color: '#334155',
+        backgroundColor: '#eef2ff',
+        color: '#1e293b',
         fontWeight: 700,
-        fontSize: '0.74rem',
+        fontSize: '0.75rem',
         borderBottom: '1px solid #e2e8f0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 2,
       },
     },
     muiTableBodyRowProps: ({ row }) => ({
       sx: {
         backgroundColor: row.index % 2 === 0 ? '#ffffff' : '#f8fafc',
-        '&:hover td': {
-          backgroundColor: '#eff6ff',
-        },
+        transition: 'all .18s ease',
+        '&:hover td': { backgroundColor: '#e9efff' },
+        '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 18px -16px rgba(79,70,229,.8)' },
       },
     }),
     muiTableBodyCellProps: {
@@ -152,8 +157,10 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
       sx: {
         minWidth: '300px',
         '& .MuiOutlinedInput-root': {
-          borderRadius: '12px',
+          borderRadius: '999px',
           backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 0 rgba(15,23,42,.02)',
         },
       },
     },
@@ -165,28 +172,28 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
   })
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+    <section className="rounded-3xl border border-slate-200/80 bg-linear-to-br from-white via-white to-indigo-50/20 shadow-sm shadow-blue-100/40">
+      <div className="border-b border-slate-200 bg-linear-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-4">
         <h2 className="text-lg font-semibold text-slate-900">Mis reservas</h2>
         <p className="mt-1 text-sm text-slate-500">
           Consulta y da seguimiento a tus citas agendadas.
         </p>
-        <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm">
           <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
             <span className="text-slate-500">Resumen de reservas</span>
             <span className="text-slate-700">{rows.length} citas</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-emerald-500"
+              className="h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-blue-600"
               style={{ width: `${rows.length ? (confirmedCount / rows.length) * 100 : 0}%` }}
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
+            <span className="rounded-full bg-blue-50/80 px-2.5 py-1 text-blue-600">
               Confirmadas: {confirmedCount}
             </span>
-            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-blue-700">
+            <span className="rounded-full bg-indigo-50/80 px-2.5 py-1 text-indigo-600">
               Pendientes/Reprogramadas: {pendingCount + rescheduledCount}
             </span>
           </div>

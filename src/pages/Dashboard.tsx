@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuthContext'
 import { useBarberosListQuery } from '@/hooks/useBarberos'
-import { useCitasByBarberoQuery } from '@/hooks/useCitas'
+import { useCitasByBarberoQuery, useCitasByUserQuery } from '@/hooks/useCitas'
 import { decodeJwtPayload, isValidJwtToken } from '@/lib/jwt'
 import type { CitaDTO } from '@/services/citaService'
 import { useMemo } from 'react'
@@ -86,15 +86,32 @@ export function Dashboard() {
   const isAdmin = selectedRole === 'Administrador'
   const isCliente = selectedRole === 'Cliente'
   const isBarbero = selectedRole === 'Barbero'
-  const barberoUserId = useMemo(() => resolveUserIdFromToken(token), [token])
+  const currentUserId = useMemo(() => resolveUserIdFromToken(token), [token])
   const { data: promociones = [] } = usePromocionesListQuery({ enabled: isCliente || isAdmin })
   const { data: servicios = [] } = useServiciosQuery({ enabled: isAdmin })
   const { data: barberos = [] } = useBarberosListQuery({ enabled: isAdmin })
   const { data: usuarios = [] } = useUsuariosListQuery({ enabled: isAdmin })
-  const { data: citasBarberoResponse } = useCitasByBarberoQuery(barberoUserId ?? 0, {
-    enabled: isBarbero && Boolean(barberoUserId),
+  const { data: citasBarberoResponse } = useCitasByBarberoQuery(currentUserId ?? 0, {
+    enabled: isBarbero && Boolean(currentUserId),
+  })
+  const { data: citasClienteResponse } = useCitasByUserQuery(currentUserId ?? 0, {
+    enabled: isCliente && Boolean(currentUserId),
   })
   const citasBarbero = useMemo(() => normalizeCitasPayload(citasBarberoResponse), [citasBarberoResponse])
+  const citasClienteActivas = useMemo(() => (citasClienteResponse ? 1 : 0), [citasClienteResponse])
+  const clienteFavoritos = useMemo(() => citasClienteResponse?.servicios?.length ?? 0, [citasClienteResponse])
+  const clienteUltimoCorte = useMemo(() => {
+    const fecha = citasClienteResponse?.fechaInicio
+    if (!fecha) return 'Sin historial'
+    const date = toDate(fecha)
+    if (Number.isNaN(date.getTime())) return 'Sin historial'
+    const diffMs = Date.now() - date.getTime()
+    if (diffMs < 0) return 'Pendiente'
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    if (days === 0) return 'Hoy'
+    if (days === 1) return 'Hace 1 dia'
+    return `Hace ${days} dias`
+  }, [citasClienteResponse])
   const barberoTotalCitas = citasBarbero.length
   const barberoAtendidas = useMemo(
     () => citasBarbero.filter((cita) => Number(cita.estatus) === 3).length,
@@ -555,7 +572,7 @@ export function Dashboard() {
               <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
                 {selectedRole === 'Administrador' && `${usuariosActivos}/${usuarios.length}`}
                 {selectedRole === 'Barbero' && `${barberoAtendidas}/${barberoTotalCitas}`}
-                {selectedRole === 'Cliente' && '2'}
+                {selectedRole === 'Cliente' && `${citasClienteActivas}`}
               </p>
               <p className={`mt-1 text-xs ${selectedRole === 'Administrador' ? 'text-slate-600' : 'text-emerald-600'}`}>
                 {selectedRole === 'Administrador' && 'Usuarios activos / total del sistema'}
@@ -570,7 +587,7 @@ export function Dashboard() {
                   <p className="text-base font-semibold text-slate-900">
                     {selectedRole === 'Administrador' && `${serviciosActivos}`}
                     {selectedRole === 'Barbero' && barberoTiempoPromedio}
-                    {selectedRole === 'Cliente' && '3'}
+                    {selectedRole === 'Cliente' && `${clienteFavoritos}`}
                   </p>
                 </div>
                 <div className="rounded-lg bg-slate-100/80 p-2.5 text-slate-600">
@@ -580,7 +597,7 @@ export function Dashboard() {
                   <p className="text-base font-semibold text-slate-900">
                     {selectedRole === 'Administrador' && `${promocionesPorVencer}`}
                     {selectedRole === 'Barbero' && barberoSiguienteCita}
-                    {selectedRole === 'Cliente' && 'Hace 12 dias'}
+                    {selectedRole === 'Cliente' && clienteUltimoCorte}
                   </p>
                 </div>
               </div>

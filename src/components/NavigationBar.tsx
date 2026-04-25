@@ -7,7 +7,6 @@ import {
   FaChevronDown,
   FaCut,
   FaHome,
-  FaPlusCircle,
   FaTag,
   FaSearch,
   FaSignOutAlt,
@@ -40,7 +39,7 @@ const navItemsByRole: Record<UserRole, NavItem[]> = {
     Administrador: [
     { to: '/', label: 'Panel general', icon: FaHome },
     { to: '/servicios', label: 'Servicios', icon: FaCut },
-    { to: '/anadidos', label: 'Añadidos', icon: FaPlusCircle },
+    // /anadidos
     { to: '/perfumes', label: 'Perfumes', icon: FaSprayCan },
     { to: '/promociones', label: 'Promociones', icon: FaTag },
     { to: '/barberos', label: 'Barberos', icon: FaUserTie },

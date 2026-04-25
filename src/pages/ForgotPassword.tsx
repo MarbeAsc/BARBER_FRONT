@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CustomButton } from '../components/Button'
+import { useCorreoRecuperacionMutation } from '@/hooks/useCorreo'
+import { mensajeRespuestaUsuario } from '@/lib/respuesta-api'
 import { showNotification } from '../lib/notifications'
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const correoRecuperacionMutation = useCorreoRecuperacionMutation()
 
   return (
     <main className="login-page login-layout grid min-h-svh w-full text-slate-800 antialiased lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
@@ -70,6 +73,9 @@ export function ForgotPassword() {
           <div className="mt-5 space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
             <p className="font-semibold">Solicitud enviada correctamente</p>
             <p>Si el correo existe, recibirás instrucciones en unos minutos.</p>
+            <Link to="/reset-password" className="inline-flex text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+              Ya tengo token, restablecer contraseña
+            </Link>
             <CustomButton
               type="button"
               variant="secondary"
@@ -89,7 +95,7 @@ export function ForgotPassword() {
         ) : (
           <form
             className="mt-5 space-y-4"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault()
               if (!email.trim()) {
                 showNotification({
@@ -99,12 +105,38 @@ export function ForgotPassword() {
                 })
                 return
               }
-              setSubmitted(true)
-              showNotification({
-                title: 'Solicitud enviada',
-                message: 'Si el correo existe, te enviamos el enlace de recuperación.',
-                variant: 'info',
-              })
+              try {
+                const response = await correoRecuperacionMutation.mutateAsync({
+                  email: email.trim(),
+                })
+                const { ok: envioCorrecto, mensaje } = mensajeRespuestaUsuario(response)
+
+                if (envioCorrecto) {
+                  setSubmitted(true)
+                  showNotification({
+                    title: 'Solicitud enviada',
+                    message: mensaje || 'El correo de recuperación se envió correctamente.',
+                    variant: 'success',
+                  })
+                  return
+                }
+
+                showNotification({
+                  title: 'No se pudo enviar el correo',
+                  message: mensaje || 'Intenta nuevamente en unos minutos.',
+                  variant: 'warning',
+                })
+              } catch (error) {
+                const message =
+                  error instanceof Error
+                    ? error.message
+                    : 'Ocurrió un error inesperado al enviar el correo de recuperación.'
+                showNotification({
+                  title: 'Error al enviar correo',
+                  message,
+                  variant: 'error',
+                })
+              }
             }}
           >
             <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
@@ -123,8 +155,9 @@ export function ForgotPassword() {
               variant="primary"
               size="lg"
               className="w-full rounded-xl"
+              disabled={correoRecuperacionMutation.isPending}
             >
-              Enviar enlace de recuperación
+              {correoRecuperacionMutation.isPending ? 'Enviando...' : 'Enviar enlace de recuperación'}
             </CustomButton>
           </form>
         )}

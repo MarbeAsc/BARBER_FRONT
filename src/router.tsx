@@ -11,6 +11,7 @@ import { RootLayout } from './layouts/RootLayout'
 import { ContactPage } from './pages/ContactPage'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { Login } from './pages/Login'
+import { ResetPassword } from './pages/ResetPassword'
 import { Register } from './pages/Register'
 import { RouteErrorPage } from './pages/RouteErrorPage'
 
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
         element: <PublicFlowRoute />,
         children: [
           { path: 'forgot-password', element: <ForgotPassword /> },
+          { path: 'reset-password', element: <ResetPassword /> },
           { path: 'register', element: <Register /> },
           { path: 'contacto', element: <ContactPage /> },
         ],

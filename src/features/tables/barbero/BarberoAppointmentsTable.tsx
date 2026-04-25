@@ -1,4 +1,4 @@
-import { FaPen, FaTrashAlt } from 'react-icons/fa'
+
 import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { CustomButton } from '../../../components/Button'
 import { useCitasByBarberoQuery } from '@/hooks/useCitas'
@@ -106,7 +106,7 @@ export function BarberoAppointmentsTable({ idBarbero, onEdit, onDelete }: Barber
     enableFullScreenToggle: false,
     enableHiding: false,
     enableGlobalFilter: true,
-    enableRowActions: true,
+    enableRowActions: false,
     enableRowSelection: false,
     positionActionsColumn: 'last',
     initialState: {
@@ -126,32 +126,7 @@ export function BarberoAppointmentsTable({ idBarbero, onEdit, onDelete }: Barber
         Tip: usa filtros para encontrar
       </span>
     ),
-    renderRowActions: ({ row }) => (
-      <div className="inline-flex gap-2">
-        <CustomButton
-          type="button"
-          variant="ghost"
-          iconOnly
-          tooltip="Editar"
-          aria-label="Editar"
-          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50/70 hover:text-blue-700"
-          onClick={() => onEdit?.(row.original)}
-        >
-          <FaPen className="h-3.5 w-3.5" />
-        </CustomButton>
-        <CustomButton
-          type="button"
-          variant="danger"
-          iconOnly
-          tooltip="Eliminar"
-          aria-label="Eliminar"
-          className="h-8 w-8 rounded-md border border-transparent bg-slate-100/80 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50/70 hover:text-rose-700"
-          onClick={() => onDelete?.(row.original)}
-        >
-          <FaTrashAlt className="h-3.5 w-3.5" />
-        </CustomButton>
-      </div>
-    ),
+   
     localization: {
       actions: 'Acciones',
       noRecordsToDisplay: 'No hay registros para mostrar',

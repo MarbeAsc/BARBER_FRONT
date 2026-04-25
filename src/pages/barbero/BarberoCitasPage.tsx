@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { FaClock } from 'react-icons/fa'
-import { CustomButton } from '../../components/Button'
+
 import { useAuth } from '@/hooks/useAuthContext'
 import { decodeJwtPayload, isValidJwtToken } from '@/lib/jwt'
 import { BarberoBloqueoModal } from '../../features/modals/barbero/BarberoBloqueoModal'

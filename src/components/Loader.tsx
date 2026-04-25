@@ -99,7 +99,7 @@ export function Loader() {
       return
     }
 
-    const nextPath = navigation.location?.pathname ?? location.pathname
+    const nextPath = location.pathname
     const elapsed = performance.now() - loadStartedAt.current
     const remainder = Math.max(0, MIN_VISIBLE_MS - elapsed)
 

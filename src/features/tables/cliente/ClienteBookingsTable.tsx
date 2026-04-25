@@ -1,6 +1,9 @@
 import { FaPen, FaTrashAlt } from 'react-icons/fa'
 import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { CustomButton } from '../../../components/Button'
+import { useCitasByUserQuery } from '@/hooks/useCitas'
+import type { CitaDetalladaDTO, ServicioCitaDetalladoDTO } from '@/services/citaService'
+import { useMemo } from 'react'
 
 type BookingRow = {
   servicio: string
@@ -11,7 +14,7 @@ type BookingRow = {
 }
 
 type ClienteBookingsTableProps = {
-  rows: BookingRow[]
+  idUser: number
   onEdit?: (row: BookingRow) => void
   onDelete?: (row: BookingRow) => void
 }
@@ -22,7 +25,56 @@ function badgeClass(status: BookingRow['estado']) {
   return 'bg-blue-100 text-blue-700'
 }
 
-export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookingsTableProps) {
+function formatDate(value?: string) {
+  if (!value) return 'Sin fecha'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Sin fecha'
+  return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
+}
+
+function formatHour(value?: string) {
+  if (!value) return 'Sin hora'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Sin hora'
+  return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date)
+}
+
+function mapEstado(estatusDescripcion?: string): BookingRow['estado'] {
+  const normalized = estatusDescripcion?.trim().toLowerCase() ?? ''
+  if (normalized.includes('confirm')) return 'Confirmada'
+  if (normalized.includes('reprogram')) return 'Reprogramada'
+  return 'Pendiente'
+}
+
+function normalizeRows(payload?: CitaDetalladaDTO | null): BookingRow[] {
+  if (!payload) return []
+  const servicios = payload.servicios ?? []
+  if (servicios.length === 0) {
+    return [
+      {
+        servicio: 'Sin servicio',
+        barbero: 'Sin barbero',
+        fecha: formatDate(payload.fechaInicio),
+        hora: formatHour(payload.fechaInicio),
+        estado: mapEstado(payload.estatusDescripcion),
+      },
+    ]
+  }
+
+  return servicios.map((servicio: ServicioCitaDetalladoDTO) => ({
+    servicio: servicio.nombreServicio?.trim() || 'Sin servicio',
+    barbero: servicio.nombreBarbero?.trim() || 'Sin barbero',
+    fecha: formatDate(payload.fechaInicio),
+    hora: formatHour(payload.fechaInicio),
+    estado: mapEstado(payload.estatusDescripcion),
+  }))
+}
+
+export function ClienteBookingsTable({ idUser, onEdit, onDelete }: ClienteBookingsTableProps) {
+  const { data, isPending, isError, error, refetch } = useCitasByUserQuery(idUser, {
+    enabled: Number.isFinite(idUser) && idUser > 0,
+  })
+  const rows = useMemo(() => normalizeRows(data), [data])
   const confirmedCount = rows.filter((row) => row.estado === 'Confirmada').length
   const pendingCount = rows.filter((row) => row.estado === 'Pendiente').length
   const rescheduledCount = rows.filter((row) => row.estado === 'Reprogramada').length
@@ -46,6 +98,7 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
   const table = useMaterialReactTable({
     columns,
     data: rows,
+    state: { isLoading: isPending, showProgressBars: isPending },
     enableColumnActions: false,
     enableColumnFilters: true,
     enableDensityToggle: false,
@@ -178,6 +231,14 @@ export function ClienteBookingsTable({ rows, onEdit, onDelete }: ClienteBookings
         <p className="mt-1 text-sm text-slate-500">
           Consulta y da seguimiento a tus citas agendadas.
         </p>
+        {isError ? (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+            <p>{error instanceof Error ? error.message : 'No se pudo cargar el listado de citas.'}</p>
+            <CustomButton type="button" variant="secondary" size="sm" className="mt-2 rounded-lg" onClick={() => void refetch()}>
+              Reintentar
+            </CustomButton>
+          </div>
+        ) : null}
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm">
           <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
             <span className="text-slate-500">Resumen de reservas</span>

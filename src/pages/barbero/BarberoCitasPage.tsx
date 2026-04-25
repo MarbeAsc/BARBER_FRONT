@@ -2,23 +2,36 @@ import { useState } from 'react'
 import { FaClock } from 'react-icons/fa'
 import { CustomButton } from '../../components/Button'
 import { useAuth } from '@/hooks/useAuthContext'
+import { decodeJwtPayload, isValidJwtToken } from '@/lib/jwt'
 import { BarberoBloqueoModal } from '../../features/modals/barbero/BarberoBloqueoModal'
 import { BarberoAppointmentsTable } from '../../features/tables/barbero/BarberoAppointmentsTable'
 import { showNotification } from '../../lib/notifications'
 
-const demoCitas = [
-  {
-    hora: '10:00',
-    cliente: 'Cliente demo',
-    servicio: 'Corte + barba',
-    duracion: '45 min',
-    estado: 'Confirmada' as const,
-  },
-]
+function resolveUserIdFromToken(token?: string | null): number | null {
+  if (!isValidJwtToken(token)) return null
+  const payload = decodeJwtPayload<Record<string, unknown>>(token) ?? {}
+  const rawId =
+    payload.id ??
+    payload.userId ??
+    payload.idUsuario ??
+    payload.idusuario ??
+    payload.IdUsuario ??
+    payload.sub ??
+    payload.nameid ??
+    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+
+  if (typeof rawId === 'number' && Number.isFinite(rawId) && rawId > 0) return rawId
+  if (typeof rawId === 'string') {
+    const parsed = Number(rawId)
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+  }
+  return null
+}
 
 export function BarberoCitasPage() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [bloqueoModalOpen, setBloqueoModalOpen] = useState(false)
+  const userId = resolveUserIdFromToken(token)
 
   return (
     <main className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -66,18 +79,18 @@ export function BarberoCitasPage() {
       />
 
       <BarberoAppointmentsTable
-        rows={demoCitas}
+        idBarbero={userId ?? 0}
         onEdit={(row) =>
           showNotification({
             title: 'Citas',
-            message: `Editar cita ${row.hora} — ${row.cliente} (${row.servicio}).`,
+            message: `Editar cita ${row.fecha} ${row.hora} — ${row.cliente} (${row.servicio}).`,
             variant: 'warning',
           })
         }
         onDelete={(row) =>
           showNotification({
             title: 'Citas',
-            message: `Eliminar cita ${row.hora} — ${row.cliente} (${row.servicio}).`,
+            message: `Eliminar cita ${row.fecha} ${row.hora} — ${row.cliente} (${row.servicio}).`,
             variant: 'error',
           })
         }

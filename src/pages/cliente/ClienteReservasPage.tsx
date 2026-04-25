@@ -1,20 +1,36 @@
 import { useState } from 'react'
 import { FaCalendarPlus } from 'react-icons/fa'
 import { useAuth } from '@/hooks/useAuthContext'
+import { decodeJwtPayload, isValidJwtToken } from '@/lib/jwt'
 import { CustomButton } from '../../components/Button'
 import { ClienteBookingsTable } from '../../features/tables/cliente/ClienteBookingsTable'
 import { ClienteReservaModal } from '../../features/modals/cliente/ClienteReservaModal'
 import { showNotification } from '../../lib/notifications'
 
-const initialRows = [
-  { servicio: 'Corte clásico', barbero: 'Luis Herrera', fecha: '2026-04-24', hora: '15:30', estado: 'Confirmada' as const },
-  { servicio: 'Corte + barba', barbero: 'Jorge Paredes', fecha: '2026-04-27', hora: '16:00', estado: 'Pendiente' as const },
-  { servicio: 'Skin fade', barbero: 'Marco Solís', fecha: '2026-05-02', hora: '11:00', estado: 'Reprogramada' as const },
-]
+function resolveUserIdFromToken(token?: string | null): number | null {
+  if (!isValidJwtToken(token)) return null
+  const payload = decodeJwtPayload<Record<string, unknown>>(token) ?? {}
+  const rawId =
+    payload.id ??
+    payload.userId ??
+    payload.idUsuario ??
+    payload.idusuario ??
+    payload.IdUsuario ??
+    payload.sub ??
+    payload.nameid ??
+    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+
+  if (typeof rawId === 'number' && Number.isFinite(rawId) && rawId > 0) return rawId
+  if (typeof rawId === 'string') {
+    const parsed = Number(rawId)
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+  }
+  return null
+}
 
 export function ClienteReservasPage() {
-  const { user } = useAuth()
-  const [rows, setRows] = useState(initialRows)
+  const { user, token } = useAuth()
+  const userId = resolveUserIdFromToken(token)
   const [reservaModalOpen, setReservaModalOpen] = useState(false)
 
   const handleReservar = ({
@@ -28,7 +44,6 @@ export function ClienteReservasPage() {
     fecha: string
     hora: string
   }) => {
-    setRows((prev) => [{ servicio, barbero, fecha, hora, estado: 'Pendiente' as const }, ...prev])
     showNotification({
       title: 'Reserva registrada',
       message: `Tu cita de ${servicio} con ${barbero} fue creada para ${fecha} a las ${hora}.`,
@@ -75,7 +90,7 @@ export function ClienteReservasPage() {
         onReservar={handleReservar}
       />
       <ClienteBookingsTable
-        rows={rows}
+        idUser={userId ?? 0}
         onEdit={(row) =>
           showNotification({
             title: 'Reservas',

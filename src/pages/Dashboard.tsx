@@ -1,5 +1,8 @@
 import { useAuth } from '@/hooks/useAuthContext'
 import { useBarberosListQuery } from '@/hooks/useBarberos'
+import { useCitasByBarberoQuery } from '@/hooks/useCitas'
+import { decodeJwtPayload, isValidJwtToken } from '@/lib/jwt'
+import type { CitaDTO } from '@/services/citaService'
 import { useMemo } from 'react'
 import { usePromocionesListQuery } from '@/hooks/usePromociones'
 import { useServiciosQuery } from '@/hooks/useServicios'
@@ -25,6 +28,32 @@ type Appointment = {
   statusClass: string
 }
 
+function resolveUserIdFromToken(token?: string | null): number | null {
+  if (!isValidJwtToken(token)) return null
+  const payload = decodeJwtPayload<Record<string, unknown>>(token) ?? {}
+  const rawId =
+    payload.id ??
+    payload.userId ??
+    payload.idUsuario ??
+    payload.idusuario ??
+    payload.IdUsuario ??
+    payload.sub ??
+    payload.nameid ??
+    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+
+  if (typeof rawId === 'number' && Number.isFinite(rawId) && rawId > 0) return rawId
+  if (typeof rawId === 'string') {
+    const parsed = Number(rawId)
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+  }
+  return null
+}
+
+function normalizeCitasPayload(payload: CitaDTO | CitaDTO[] | null | undefined): CitaDTO[] {
+  if (!payload) return []
+  return Array.isArray(payload) ? payload : [payload]
+}
+
 function toDate(value: string | Date): Date {
   return value instanceof Date ? value : new Date(value)
 }
@@ -48,7 +77,7 @@ function parseMetricValue(value: string): number {
 }
 
 export function Dashboard() {
-  const { username } = useAuth()
+  const { username, token } = useAuth()
   const navigate = useNavigate()
   const selectedRole = useMemo(
     () => username?.role ?? inferRoleFromEmail(username?.email ?? ''),
@@ -56,10 +85,58 @@ export function Dashboard() {
   )
   const isAdmin = selectedRole === 'Administrador'
   const isCliente = selectedRole === 'Cliente'
+  const isBarbero = selectedRole === 'Barbero'
+  const barberoUserId = useMemo(() => resolveUserIdFromToken(token), [token])
   const { data: promociones = [] } = usePromocionesListQuery({ enabled: isCliente || isAdmin })
   const { data: servicios = [] } = useServiciosQuery({ enabled: isAdmin })
   const { data: barberos = [] } = useBarberosListQuery({ enabled: isAdmin })
   const { data: usuarios = [] } = useUsuariosListQuery({ enabled: isAdmin })
+  const { data: citasBarberoResponse } = useCitasByBarberoQuery(barberoUserId ?? 0, {
+    enabled: isBarbero && Boolean(barberoUserId),
+  })
+  const citasBarbero = useMemo(() => normalizeCitasPayload(citasBarberoResponse), [citasBarberoResponse])
+  const barberoTotalCitas = citasBarbero.length
+  const barberoAtendidas = useMemo(
+    () => citasBarbero.filter((cita) => Number(cita.estatus) === 3).length,
+    [citasBarbero],
+  )
+  const barberoTiempoPromedio = useMemo(() => {
+    const durations = citasBarbero
+      .map((cita) => {
+        const inicio = toDate(cita.fechaInicio)
+        const fin = toDate(cita.fechaTermino)
+        if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) return null
+        const minutes = Math.round((fin.getTime() - inicio.getTime()) / 60000)
+        return minutes > 0 ? minutes : null
+      })
+      .filter((value): value is number => value !== null)
+
+    if (durations.length === 0) return 'N/D'
+    const avg = Math.round(durations.reduce((acc, value) => acc + value, 0) / durations.length)
+    return `${avg} min`
+  }, [citasBarbero])
+  const barberoSiguienteCita = useMemo(() => {
+    const now = Date.now()
+    const nextDate = citasBarbero
+      .map((cita) => toDate(cita.fechaInicio))
+      .filter((date) => !Number.isNaN(date.getTime()) && date.getTime() >= now)
+      .sort((a, b) => a.getTime() - b.getTime())[0]
+
+    if (!nextDate) return 'Sin citas'
+    return nextDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false })
+  }, [citasBarbero])
+  const barberoAppointments = useMemo<Appointment[]>(
+    () =>
+      citasBarbero.map((cita, index) => ({
+        hour: toDate(cita.fechaInicio).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        client: cita.idCliente ? `Cliente #${cita.idCliente}` : 'Cliente por confirmar',
+        service: 'Servicio asignado',
+        barber: username?.username ?? 'Tú',
+        status: Number(cita.estatus) === 1 ? 'Confirmada' : 'Pendiente',
+        statusClass: Number(cita.estatus) === 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700',
+      })),
+    [citasBarbero, username?.username],
+  )
 
   const promocionesVigentesAll = useMemo(() => {
     const now = new Date()
@@ -153,10 +230,10 @@ export function Dashboard() {
       { label: 'Promociones vigentes', value: String(promocionesVigentesAll.length), delta: `${promocionesPorVencer} por vencer` },
     ],
     Barbero: [
-      { label: 'Mis citas hoy', value: '8', delta: '2 en curso' },
-      { label: 'Por atender', value: '3', delta: 'Próxima: 11:45' },
-      { label: 'Atendidas', value: '5', delta: 'Buen ritmo de trabajo' },
-      { label: 'Disponibilidad', value: '2 hrs', delta: 'Huecos entre 14:00 y 16:00' },
+      { label: 'Mis citas hoy', value: String(citasBarbero.length), delta: 'Citas asignadas' },
+      { label: 'Por atender', value: String(citasBarbero.length), delta: 'Agenda actual' },
+      { label: 'Atendidas', value: '0', delta: 'Pendiente de seguimiento' },
+      { label: 'Disponibilidad', value: 'N/D', delta: 'Consulta agenda detallada' },
     ],
     Cliente: [
       { label: 'Promociones activas', value: String(promocionesVigentesAll.length), delta: 'Disponibles ahora' },
@@ -218,38 +295,7 @@ export function Dashboard() {
       },
     ],
     Barbero: [
-      {
-        hour: '10:30',
-        client: 'Luis Herrera',
-        service: 'Corte skin fade',
-        barber: username?.username ?? 'Tú',
-        status: 'Confirmada',
-        statusClass: 'bg-emerald-100 text-emerald-700',
-      },
-      {
-        hour: '11:45',
-        client: 'David Perea',
-        service: 'Arreglo de barba',
-        barber: username?.username ?? 'Tú',
-        status: 'Pendiente',
-        statusClass: 'bg-blue-100 text-blue-700',
-      },
-      {
-        hour: '13:00',
-        client: 'Marco Solis',
-        service: 'Corte + cejas',
-        barber: username?.username ?? 'Tú',
-        status: 'Pendiente',
-        statusClass: 'bg-blue-100 text-blue-700',
-      },
-      {
-        hour: '15:00',
-        client: 'Javier Ochoa',
-        service: 'Corte clásico',
-        barber: username?.username ?? 'Tú',
-        status: 'Confirmada',
-        statusClass: 'bg-emerald-100 text-emerald-700',
-      },
+      ...barberoAppointments,
     ],
     Cliente: [
       {
@@ -362,7 +408,7 @@ export function Dashboard() {
               </h2>
               <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
                 {selectedRole === 'Administrador' && `${usuariosActivos} usuarios activos`}
-                {selectedRole === 'Barbero' && '4 citas asignadas'}
+                {selectedRole === 'Barbero' && `${citasBarbero.length} citas asignadas`}
                 {selectedRole === 'Cliente' && `${promocionesVigentes.length} activas`}
               </span>
             </div>
@@ -460,35 +506,41 @@ export function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {appointmentsByRole[selectedRole].map((item) => (
-                  <article
-                    key={`${item.hour}-${item.client}`}
-                    className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 transition-colors hover:border-indigo-200 hover:bg-white"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="text-lg font-semibold tracking-tight text-slate-900">
-                          {item.hour}
-                        </p>
-                        <p className="text-sm font-medium text-slate-700">
-                          {item.client}
-                        </p>
-                        <p className="text-xs text-slate-500">{item.service}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-slate-500">Barbero asignado</p>
-                        <p className="text-sm font-semibold text-slate-800">
-                          {item.barber}
-                        </p>
-                        <span
-                          className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.statusClass}`}
-                        >
-                          {item.status}
-                        </span>
-                      </div>
-                    </div>
+                {selectedRole === 'Barbero' && appointmentsByRole[selectedRole].length === 0 ? (
+                  <article className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600">
+                    No hay citas asignadas para mostrar en este momento.
                   </article>
-                ))}
+                ) : (
+                  appointmentsByRole[selectedRole].map((item) => (
+                    <article
+                      key={`${item.hour}-${item.client}`}
+                      className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 transition-colors hover:border-indigo-200 hover:bg-white"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-lg font-semibold tracking-tight text-slate-900">
+                            {item.hour}
+                          </p>
+                          <p className="text-sm font-medium text-slate-700">
+                            {item.client}
+                          </p>
+                          <p className="text-xs text-slate-500">{item.service}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500">Barbero asignado</p>
+                          <p className="text-sm font-semibold text-slate-800">
+                            {item.barber}
+                          </p>
+                          <span
+                            className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.statusClass}`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
               </div>
             )}
           </section>
@@ -502,7 +554,7 @@ export function Dashboard() {
               </h3>
               <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
                 {selectedRole === 'Administrador' && `${usuariosActivos}/${usuarios.length}`}
-                {selectedRole === 'Barbero' && '5/8'}
+                {selectedRole === 'Barbero' && `${barberoAtendidas}/${barberoTotalCitas}`}
                 {selectedRole === 'Cliente' && '2'}
               </p>
               <p className={`mt-1 text-xs ${selectedRole === 'Administrador' ? 'text-slate-600' : 'text-emerald-600'}`}>
@@ -517,7 +569,7 @@ export function Dashboard() {
                   </p>
                   <p className="text-base font-semibold text-slate-900">
                     {selectedRole === 'Administrador' && `${serviciosActivos}`}
-                    {selectedRole === 'Barbero' && '42 min'}
+                    {selectedRole === 'Barbero' && barberoTiempoPromedio}
                     {selectedRole === 'Cliente' && '3'}
                   </p>
                 </div>
@@ -527,7 +579,7 @@ export function Dashboard() {
                   </p>
                   <p className="text-base font-semibold text-slate-900">
                     {selectedRole === 'Administrador' && `${promocionesPorVencer}`}
-                    {selectedRole === 'Barbero' && '14:00'}
+                    {selectedRole === 'Barbero' && barberoSiguienteCita}
                     {selectedRole === 'Cliente' && 'Hace 12 dias'}
                   </p>
                 </div>

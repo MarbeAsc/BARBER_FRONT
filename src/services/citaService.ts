@@ -1,4 +1,5 @@
 import { apiSSO } from '@/lib/api-client'
+
 import axios from 'axios'
 
 export interface CitaDTO {
@@ -24,6 +25,18 @@ export interface CitaCreacionDTO extends CitaDTO {
 export interface RespuestaDTO {
   estatus: boolean
   descripcion: string
+}
+export interface ServicioCitaDetalladoDTO extends ServicioCitaDTO
+{
+  nombreBarbero: string
+  nombreServicio: string
+}
+
+export interface CitaDetalladaDTO extends CitaDTO {
+  nombreCliente: string
+  estatusDescripcion: string
+  total: number
+  servicios: ServicioCitaDetalladoDTO[]
 }
 
 export async function createCita(data: CitaCreacionDTO): Promise<RespuestaDTO> {
@@ -56,3 +69,21 @@ export async function getCitasByBarbero(idBarbero: number): Promise<CitaDTO> {
     throw new Error('Error inesperado al obtener las citas del barbero.')
   }
 }
+
+export async function getCitasByUserId(idUsuario: number): Promise<CitaDetalladaDTO> {
+  try {
+    const response = await apiSSO.get(`/cita/obtenerListadoDetalladoXUsuario/${idUsuario}`)
+    return response.data
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        `Error de API en getCitasByUserId: ${error.response?.status} - ${error.response?.data}`,
+        error,
+      )
+      throw new Error(`Error ${error.response?.status}: No se pudieron obtener las citas del usuario.`)
+    }
+    console.error('Error al obtener las citas del usuario:', error)
+    throw new Error('Error inesperado al obtener las citas del usuario.')
+  }
+}
+

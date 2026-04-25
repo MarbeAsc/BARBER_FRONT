@@ -1,19 +1,50 @@
 import { FaPen, FaTrashAlt } from 'react-icons/fa'
 import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { CustomButton } from '../../../components/Button'
+import { useCitasByBarberoQuery } from '@/hooks/useCitas'
+import type { CitaDTO } from '@/services/citaService'
+import { useMemo } from 'react'
+
 
 type AppointmentRow = {
+  id: number
   hora: string
+  fecha: string
   cliente: string
   servicio: string
-  duracion: string
+  total: string
   estado: 'Pendiente' | 'Confirmada' | 'En curso' | 'Finalizada'
 }
 
 type BarberoAppointmentsTableProps = {
-  rows: AppointmentRow[]
+  idBarbero: number
   onEdit?: (row: AppointmentRow) => void
   onDelete?: (row: AppointmentRow) => void
+}
+
+function formatDate(value?: string) {
+  if (!value) return 'Sin fecha'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Sin fecha'
+  return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
+}
+
+function formatHour(value?: string) {
+  if (!value) return 'Sin hora'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Sin hora'
+  return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date)
+}
+
+function formatCurrency(value?: number) {
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value ?? 0)
+}
+
+function mapEstatusByCode(estatus?: number | null): AppointmentRow['estado'] {
+  if (estatus === 3) return 'Finalizada'
+  if (estatus === 2) return 'En curso'
+  if (estatus === 1) return 'Confirmada'
+  return 'Pendiente'
 }
 
 function badgeClass(status: AppointmentRow['estado']) {
@@ -23,16 +54,37 @@ function badgeClass(status: AppointmentRow['estado']) {
   return 'bg-blue-100 text-blue-700'
 }
 
-export function BarberoAppointmentsTable({ rows, onEdit, onDelete }: BarberoAppointmentsTableProps) {
-  const completedCount = rows.filter((row) => row.estado === 'Finalizada').length
-  const activeCount = rows.filter((row) => row.estado === 'En curso' || row.estado === 'Confirmada').length
+export function BarberoAppointmentsTable({ idBarbero, onEdit, onDelete }: BarberoAppointmentsTableProps) {
+  const { data, isPending, isError, error, refetch } = useCitasByBarberoQuery(idBarbero, {
+    enabled: Number.isFinite(idBarbero) && idBarbero > 0,
+  })
+  const rows = useMemo(() => {
+    if (!data) return []
+
+    const cita = data as CitaDTO
+    return [
+      {
+        id: cita.id,
+        hora: formatHour(cita.fechaInicio),
+        fecha: formatDate(cita.fechaInicio),
+        cliente: cita.idCliente ? `Cliente #${cita.idCliente}` : 'Sin cliente',
+        servicio: 'Sin servicio',
+        total: formatCurrency(0),
+        estado: mapEstatusByCode(cita.estatus),
+      },
+    ]
+  }, [data])
+
+  const activeCount = rows.filter((row) => row.estado === 'Confirmada' || row.estado === 'En curso').length
   const pendingCount = rows.filter((row) => row.estado === 'Pendiente').length
+  const completedCount = rows.filter((row) => row.estado === 'Finalizada').length
 
   const columns: MRT_ColumnDef<AppointmentRow>[] = [
+    { accessorKey: 'fecha', header: 'Fecha' },
     { accessorKey: 'hora', header: 'Hora' },
     { accessorKey: 'cliente', header: 'Cliente' },
     { accessorKey: 'servicio', header: 'Servicio' },
-    { accessorKey: 'duracion', header: 'Duracion' },
+    { accessorKey: 'total', header: 'Total' },
     {
       accessorKey: 'estado',
       header: 'Estado',
@@ -47,6 +99,7 @@ export function BarberoAppointmentsTable({ rows, onEdit, onDelete }: BarberoAppo
   const table = useMaterialReactTable({
     columns,
     data: rows,
+    state: { isLoading: isPending, showProgressBars: isPending },
     enableColumnActions: false,
     enableColumnFilters: true,
     enableDensityToggle: false,
@@ -179,6 +232,14 @@ export function BarberoAppointmentsTable({ rows, onEdit, onDelete }: BarberoAppo
         <p className="mt-1 text-sm text-slate-500">
           Solo se muestran citas relacionadas con tus servicios asignados.
         </p>
+        {isError ? (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+            <p>{error instanceof Error ? error.message : 'No se pudo cargar el listado de citas.'}</p>
+            <CustomButton type="button" variant="secondary" size="sm" className="mt-2 rounded-lg" onClick={() => void refetch()}>
+              Reintentar
+            </CustomButton>
+          </div>
+        ) : null}
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm">
           <div className="mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide">
             <span className="text-slate-500">Resumen de agenda</span>

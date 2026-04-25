@@ -6,15 +6,6 @@ import { ClienteBookingsTable } from '../../features/tables/cliente/ClienteBooki
 import { ClienteReservaModal } from '../../features/modals/cliente/ClienteReservaModal'
 import { showNotification } from '../../lib/notifications'
 
-const serviciosDisponibles = [
-  { nombre: 'Corte clásico', barberos: ['Luis Herrera', 'Darío Campos'] },
-  { nombre: 'Skin fade', barberos: ['Marco Solís', 'Luis Herrera'] },
-  { nombre: 'Arreglo de barba', barberos: ['Jorge Paredes', 'Marco Solís'] },
-  { nombre: 'Corte + barba', barberos: ['Jorge Paredes'] },
-]
-
-const horasDisponibles = ['09:00', '10:00', '11:30', '13:00', '15:30', '17:00']
-
 const initialRows = [
   { servicio: 'Corte clásico', barbero: 'Luis Herrera', fecha: '2026-04-24', hora: '15:30', estado: 'Confirmada' as const },
   { servicio: 'Corte + barba', barbero: 'Jorge Paredes', fecha: '2026-04-27', hora: '16:00', estado: 'Pendiente' as const },
@@ -81,8 +72,6 @@ export function ClienteReservasPage() {
       <ClienteReservaModal
         open={reservaModalOpen}
         onClose={() => setReservaModalOpen(false)}
-        servicios={serviciosDisponibles}
-        horasDisponibles={horasDisponibles}
         onReservar={handleReservar}
       />
       <ClienteBookingsTable

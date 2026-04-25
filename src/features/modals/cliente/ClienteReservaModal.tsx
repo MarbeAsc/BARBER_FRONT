@@ -1,24 +1,19 @@
 import { FaTimes } from 'react-icons/fa'
 import { CustomButton } from '../../../components/Button'
 import {
-  ClienteReservaForm,
-  type ClienteReservaFormValues,
-  type ServicioOption,
-} from '../../forms/cliente/ClienteReservaForm'
+  FormularioReservaModal,
+  type FormularioReservaModalValues,
+} from '../../forms/cliente/FormularioReservaModal'
 
 type ClienteReservaModalProps = {
   open: boolean
   onClose: () => void
-  servicios: ServicioOption[]
-  horasDisponibles: string[]
-  onReservar: (values: ClienteReservaFormValues) => void
+  onReservar: (values: FormularioReservaModalValues) => void
 }
 
 export function ClienteReservaModal({
   open,
   onClose,
-  servicios,
-  horasDisponibles,
   onReservar,
 }: ClienteReservaModalProps) {
   if (!open) return null
@@ -37,9 +32,7 @@ export function ClienteReservaModal({
         </header>
 
         <div className="max-h-[80vh] overflow-auto p-6">
-          <ClienteReservaForm
-            servicios={servicios}
-            horasDisponibles={horasDisponibles}
+          <FormularioReservaModal
             onReservar={(values) => {
               onReservar(values)
               onClose()

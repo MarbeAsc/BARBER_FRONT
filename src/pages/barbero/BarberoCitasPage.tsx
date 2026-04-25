@@ -47,21 +47,11 @@ export function BarberoCitasPage() {
         <div className="rounded-[1.35rem] bg-[linear-gradient(140deg,rgba(10,27,54,0.95)_0%,rgba(17,52,102,0.9)_55%,rgba(11,39,77,0.94)_100%)] p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-100">Gestion de disponibilidad</p>
+            <p className="text-sm font-semibold text-slate-100">Gestion de citas</p>
             <p className="text-xs text-slate-300">
-              Registra bloqueos de horario para evitar reservas en franjas ocupadas.
+              Aquí puedes ver tus citas programadas y gestionar las que tengas.
             </p>
           </div>
-          <CustomButton
-            type="button"
-            variant="primary"
-            tooltip="Agregar bloqueo"
-            leftIcon={<FaClock className="h-3.5 w-3.5" />}
-            className="rounded-xl border border-blue-400/70 bg-linear-to-r from-blue-500 via-blue-600 to-blue-500 text-white shadow-[0_12px_24px_-16px_rgba(59,130,246,0.65)] transition hover:border-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-600 hover:shadow-[0_14px_28px_-16px_rgba(29,78,216,0.8)]"
-            onClick={() => setBloqueoModalOpen(true)}
-          >
-            Bloquear horario
-          </CustomButton>
         </div>
         </div>
       </section>

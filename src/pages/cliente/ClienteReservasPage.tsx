@@ -94,14 +94,14 @@ export function ClienteReservasPage() {
         onEdit={(row) =>
           showNotification({
             title: 'Reservas',
-            message: `Editar reserva de ${row.servicio} (${row.fecha} ${row.hora}).`,
+            message: `Editar reserva de ${row.servicios} (${row.fechaiInicio} ${row.fechaTermino}).`,
             variant: 'warning',
           })
         }
         onDelete={(row) =>
           showNotification({
             title: 'Reservas',
-            message: `Eliminar reserva de ${row.servicio} (${row.fecha} ${row.hora}).`,
+            message: `Eliminar reserva de ${row.servicios} (${row.fechaiInicio} ${row.fechaTermino}).`,
             variant: 'error',
           })
         }

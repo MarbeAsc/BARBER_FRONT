@@ -70,7 +70,7 @@ export async function getCitasByBarbero(idBarbero: number): Promise<CitaDTO> {
   }
 }
 
-export async function getCitasByUserId(idUsuario: number): Promise<CitaDetalladaDTO> {
+export async function getCitasByUserId(idUsuario: number): Promise<CitaDetalladaDTO[]> {
   try {
     const response = await apiSSO.get(`/cita/obtenerListadoDetalladoXUsuario/${idUsuario}`)
     return response.data

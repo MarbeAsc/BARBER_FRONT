@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { FaBullhorn, FaClock, FaFilter, FaRegCalendarCheck, FaSyncAlt, FaTags } from 'react-icons/fa'
 import { useAuth } from '@/hooks/useAuthContext'
-import { usePromocionActiveQuery, usePromocionesListQuery } from '@/hooks/usePromociones'
+import { usePromocionActiveQuery } from '@/hooks/usePromociones'
 import type { PromocionDTO } from '@/services/promocionesSevice'
 import { CustomButton } from '@/components/Button'
 

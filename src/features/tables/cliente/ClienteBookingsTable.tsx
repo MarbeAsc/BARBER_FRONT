@@ -6,11 +6,12 @@ import type { CitaDetalladaDTO, ServicioCitaDetalladoDTO } from '@/services/cita
 import { useMemo } from 'react'
 
 type BookingRow = {
-  servicio: string
-  barbero: string
-  fecha: string
-  hora: string
-  estado: 'Confirmada' | 'Pendiente' | 'Reprogramada'
+  nombreCliente: string
+  nombrebarbero: string
+  fechaiInicio: string
+  fechaTermino: string
+  servicios: string
+  estatusDescripcion: string
 }
 
 type ClienteBookingsTableProps = {
@@ -19,7 +20,7 @@ type ClienteBookingsTableProps = {
   onDelete?: (row: BookingRow) => void
 }
 
-function badgeClass(status: BookingRow['estado']) {
+function badgeClass(status: BookingRow['estatusDescripcion']) {
   if (status === 'Confirmada') return 'bg-emerald-100 text-emerald-700'
   if (status === 'Reprogramada') return 'bg-blue-100 text-blue-700'
   return 'bg-blue-100 text-blue-700'
@@ -32,64 +33,65 @@ function formatDate(value?: string) {
   return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
 }
 
-function formatHour(value?: string) {
-  if (!value) return 'Sin hora'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return 'Sin hora'
-  return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date)
-}
 
-function mapEstado(estatusDescripcion?: string): BookingRow['estado'] {
+
+function mapEstado(estatusDescripcion?: string): BookingRow['estatusDescripcion'] {
   const normalized = estatusDescripcion?.trim().toLowerCase() ?? ''
   if (normalized.includes('confirm')) return 'Confirmada'
   if (normalized.includes('reprogram')) return 'Reprogramada'
   return 'Pendiente'
 }
+function normalizeRows(payload?: CitaDetalladaDTO[] | null): BookingRow[] {
+  if (!payload || payload.length === 0) return []
 
-function normalizeRows(payload?: CitaDetalladaDTO | null): BookingRow[] {
-  if (!payload) return []
-  const servicios = payload.servicios ?? []
-  if (servicios.length === 0) {
-    return [
-      {
-        servicio: 'Sin servicio',
-        barbero: 'Sin barbero',
-        fecha: formatDate(payload.fechaInicio),
-        hora: formatHour(payload.fechaInicio),
-        estado: mapEstado(payload.estatusDescripcion),
-      },
-    ]
-  }
+  return payload.flatMap((cita) => {
+    const servicios = cita.servicios ?? []
 
-  return servicios.map((servicio: ServicioCitaDetalladoDTO) => ({
-    servicio: servicio.nombreServicio?.trim() || 'Sin servicio',
-    barbero: servicio.nombreBarbero?.trim() || 'Sin barbero',
-    fecha: formatDate(payload.fechaInicio),
-    hora: formatHour(payload.fechaInicio),
-    estado: mapEstado(payload.estatusDescripcion),
-  }))
+    if (servicios.length === 0) {
+      return [
+        {
+          nombreCliente: cita.nombreCliente?.trim() || 'Sin cliente',
+          nombrebarbero: 'Sin barbero',
+          fechaiInicio: formatDate(cita.fechaInicio),
+          fechaTermino: formatDate(cita.fechaTermino),
+          servicios: 'Sin servicio',
+          estatusDescripcion: cita.estatusDescripcion?.trim() || 'Sin estado',
+        },
+      ]
+    }
+
+    return servicios.map((servicio: ServicioCitaDetalladoDTO) => ({
+      nombreCliente: cita.nombreCliente?.trim() || 'Sin cliente',
+      nombrebarbero: servicio.nombreBarbero?.trim() || 'Sin barbero',
+      fechaiInicio: formatDate(cita.fechaInicio),
+      fechaTermino: formatDate(cita.fechaTermino),
+      servicios: servicio.nombreServicio?.trim() || 'Sin servicio',
+      estatusDescripcion: cita.estatusDescripcion?.trim() || 'Sin estado',
+    }))
+  })
 }
-
 export function ClienteBookingsTable({ idUser }: ClienteBookingsTableProps) {
   const { data, isPending, isError, error, refetch } = useCitasByUserQuery(idUser, {
     enabled: Number.isFinite(idUser) && idUser > 0,
   })
-  const rows = useMemo(() => normalizeRows(data), [data])
-  const confirmedCount = rows.filter((row) => row.estado === 'Confirmada').length
-  const pendingCount = rows.filter((row) => row.estado === 'Pendiente').length
-  const rescheduledCount = rows.filter((row) => row.estado === 'Reprogramada').length
+  const rows = useMemo(() => normalizeRows(data as CitaDetalladaDTO[]), [data])
 
   const columns: MRT_ColumnDef<BookingRow>[] = [
-    { accessorKey: 'servicio', header: 'Servicio' },
-    { accessorKey: 'barbero', header: 'Barbero' },
-    { accessorKey: 'fecha', header: 'Fecha' },
-    { accessorKey: 'hora', header: 'Hora' },
+    { accessorKey: 'nombreCliente', header: 'Cliente' },
+    { accessorKey: 'nombrebarbero', header: 'Barbero' },
+    { accessorKey: 'fechaiInicio', header: 'Fecha inicio' },
+    { accessorKey: 'fechaTermino', header: 'Fecha fin' },
+    { accessorKey: 'servicios', header: 'Servicio' },
     {
-      accessorKey: 'estado',
+      accessorKey: 'estatusDescripcion',
       header: 'Estado',
       Cell: ({ row }) => (
-        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass(row.original.estado)}`}>
-          {row.original.estado}
+        <span
+          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass(
+            mapEstado(row.original.estatusDescripcion)
+          )}`}
+        >
+          {row.original.estatusDescripcion}
         </span>
       ),
     },
@@ -222,15 +224,15 @@ export function ClienteBookingsTable({ idUser }: ClienteBookingsTableProps) {
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-blue-600"
-              style={{ width: `${rows.length ? (confirmedCount / rows.length) * 100 : 0}%` }}
+              style={{ width: `${rows.length ? (rows.filter((row) => row.estatusDescripcion === 'Confirmada').length / rows.length) * 100 : 0}%` }}
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
             <span className="rounded-full bg-blue-50/80 px-2.5 py-1 text-blue-600">
-              Confirmadas: {confirmedCount}
+              Confirmadas: {rows.filter((row) => row.estatusDescripcion === 'Confirmada').length}
             </span>
             <span className="rounded-full bg-indigo-50/80 px-2.5 py-1 text-indigo-600">
-              Pendientes/Reprogramadas: {pendingCount + rescheduledCount}
+              Pendientes/Reprogramadas: {rows.filter((row) => row.estatusDescripcion === 'Pendiente' || row.estatusDescripcion === 'Reprogramada').length}
             </span>
           </div>
         </div>

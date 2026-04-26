@@ -73,9 +73,7 @@ export function ForgotPassword() {
           <div className="mt-5 space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-800">
             <p className="font-semibold">Solicitud enviada correctamente</p>
             <p>Si el correo existe, recibirás instrucciones en unos minutos.</p>
-            <Link to="/reset-password" className="inline-flex text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-              Ya tengo token, restablecer contraseña
-            </Link>
+            
             <CustomButton
               type="button"
               variant="secondary"

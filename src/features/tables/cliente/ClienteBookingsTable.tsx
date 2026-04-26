@@ -30,7 +30,11 @@ function formatDate(value?: string) {
   if (!value) return 'Sin fecha'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return 'Sin fecha'
-  return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
+
+  return new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short', 
+  }).format(date)
 }
 
 
@@ -79,7 +83,7 @@ export function ClienteBookingsTable({ idUser }: ClienteBookingsTableProps) {
   const columns: MRT_ColumnDef<BookingRow>[] = [
     { accessorKey: 'nombreCliente', header: 'Cliente' },
     { accessorKey: 'nombrebarbero', header: 'Barbero' },
-    { accessorKey: 'fechaiInicio', header: 'Fecha inicio' },
+    { accessorKey: 'fechaiInicio', header: 'Fecha inicio' }, 
     { accessorKey: 'fechaTermino', header: 'Fecha fin' },
     { accessorKey: 'servicios', header: 'Servicio' },
     {

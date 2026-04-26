@@ -25,7 +25,11 @@ function formatDate(value?: string) {
   if (!value) return 'Sin fecha'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return 'Sin fecha'
-  return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
+
+  return new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short', 
+  }).format(date)
 }
 
 function mapEstado(estatusDescripcion?: string): AppointmentRow['estatusDescripcion'] {

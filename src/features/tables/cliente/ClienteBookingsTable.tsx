@@ -70,7 +70,7 @@ function normalizeRows(payload?: CitaDetalladaDTO | null): BookingRow[] {
   }))
 }
 
-export function ClienteBookingsTable({ idUser, onEdit, onDelete }: ClienteBookingsTableProps) {
+export function ClienteBookingsTable({ idUser }: ClienteBookingsTableProps) {
   const { data, isPending, isError, error, refetch } = useCitasByUserQuery(idUser, {
     enabled: Number.isFinite(idUser) && idUser > 0,
   })

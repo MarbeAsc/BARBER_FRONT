@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { CustomButton } from '@/components/Button'
 import { useRestablecerContrasenaMutation } from '@/hooks/useCorreo'
 import { mensajeRespuestaUsuario } from '@/lib/respuesta-api'
@@ -7,10 +7,11 @@ import { showNotification } from '@/lib/notifications'
 
 export function ResetPassword() {
   const [searchParams] = useSearchParams()
+  const { token: tokenEnRuta } = useParams()
+  const tokenDetectado = (tokenEnRuta ?? searchParams.get('token') ?? searchParams.get('t') ?? '').trim()
   const [correo, setCorreo] = useState(searchParams.get('correo') ?? '')
-  const [token, setToken] = useState(searchParams.get('token') ?? '')
+  const [tokenRecuperacion] = useState(tokenDetectado)
   const [contrasena, setContrasena] = useState('')
-  const [confirmarContrasena, setConfirmarContrasena] = useState('')
   const [completado, setCompletado] = useState(false)
   const restablecerMutation = useRestablecerContrasenaMutation()
 
@@ -26,7 +27,7 @@ export function ResetPassword() {
             Restablece tu contraseña
           </h2>
           <p className="login-hero-description max-w-md text-sm text-slate-300/90">
-            Ingresa tu token de recuperación y define una nueva contraseña segura.
+            Ingresa tu correo y define una nueva contraseña segura.
           </p>
         </div>
       </aside>
@@ -51,18 +52,18 @@ export function ResetPassword() {
               className="mt-5 space-y-4"
               onSubmit={async (event) => {
                 event.preventDefault()
-                if (!correo.trim() || !token.trim() || !contrasena.trim()) {
+                if (!correo.trim() || !contrasena.trim()) {
                   showNotification({
                     title: 'Datos incompletos',
-                    message: 'Correo, token y contraseña son obligatorios.',
+                    message: 'Correo y contraseña son obligatorios.',
                     variant: 'warning',
                   })
                   return
                 }
-                if (contrasena !== confirmarContrasena) {
+                if (!tokenRecuperacion) {
                   showNotification({
-                    title: 'Contraseñas diferentes',
-                    message: 'La confirmación de contraseña no coincide.',
+                    title: 'Enlace inválido',
+                    message: 'No se encontró token de recuperación en el enlace.',
                     variant: 'warning',
                   })
                   return
@@ -71,7 +72,7 @@ export function ResetPassword() {
                 try {
                   const response = await restablecerMutation.mutateAsync({
                     correo: correo.trim(),
-                    token: token.trim(),
+                    token: tokenRecuperacion,
                     contrasena: contrasena.trim(),
                   })
                   const { ok, mensaje } = mensajeRespuestaUsuario(response)
@@ -86,7 +87,7 @@ export function ResetPassword() {
                   }
                   showNotification({
                     title: 'No se pudo restablecer',
-                    message: mensaje || 'Verifica el token e intenta nuevamente.',
+                    message: mensaje || 'Verifica los datos e intenta nuevamente.',
                     variant: 'warning',
                   })
                 } catch (error) {
@@ -111,36 +112,12 @@ export function ResetPassword() {
               </label>
 
               <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-                Token
-                <input
-                  type="text"
-                  required
-                  value={token}
-                  onChange={(event) => setToken(event.target.value)}
-                  className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                  placeholder="Pega aquí tu token"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
                 Nueva contraseña
                 <input
                   type="password"
                   required
                   value={contrasena}
                   onChange={(event) => setContrasena(event.target.value)}
-                  className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                  placeholder="********"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1 text-xs font-semibold text-slate-600">
-                Confirmar contraseña
-                <input
-                  type="password"
-                  required
-                  value={confirmarContrasena}
-                  onChange={(event) => setConfirmarContrasena(event.target.value)}
                   className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm font-normal text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                   placeholder="********"
                 />

@@ -47,7 +47,7 @@ export async function Correo(data:CorreoDTO): Promise< RespuestaDTO> {
  */
 export async function RestablecerContrasena(data:RestablecerContrasenaDTO): Promise< RespuestaDTO> {
 	try {
-		const response = await apiSSO.post(`/usuario/restablecerContrasena`, data);
+		const response = await apiSSO.post(`/usuario/restablecerPassword`, data);
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {

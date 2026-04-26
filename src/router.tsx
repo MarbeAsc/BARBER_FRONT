@@ -21,11 +21,12 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorPage />,
     children: [
       { path: 'login', element: <Login /> },
+      { path: 'reset-password', element: <ResetPassword /> },
       {
         element: <PublicFlowRoute />,
         children: [
           { path: 'forgot-password', element: <ForgotPassword /> },
-          { path: 'reset-password', element: <ResetPassword /> },
+          
           { path: 'register', element: <Register /> },
           { path: 'contacto', element: <ContactPage /> },
         ],

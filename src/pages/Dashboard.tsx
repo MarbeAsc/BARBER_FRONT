@@ -197,7 +197,7 @@ export function Dashboard() {
         onClick: () => navigate('/barberos'),
       },
       {
-        label: 'Administrar perfumes y extras',
+        label: 'Administrar perfumes ',
         variant: 'secondary',
         onClick: () => navigate('/perfumes'),
       },

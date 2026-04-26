@@ -168,71 +168,74 @@ export function FormularioUsuarioModal({
 
   return (
     <Fragment>
-    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
-      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5 backdrop-blur">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Administrador</p>
-            <h2 className="text-xl font-semibold text-slate-900">{modoEdicion ? 'Editar usuario' : 'Nuevo usuario'}</h2>
-          </div>
-          <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={handleClose} aria-label="Cerrar modal">
-            <FaTimes className="h-4 w-4" />
-          </CustomButton>
-        </header>
+      <div className="fixed inset-0 z-1100 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+        <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/20">
+          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-indigo-100 bg-linear-to-r from-indigo-50/95 via-white to-blue-50/90 px-6 py-5 backdrop-blur">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700/90">Administrador</p>
+              <h2 className="text-xl font-semibold text-slate-900">{modoEdicion ? 'Editar usuario' : 'Nuevo usuario'}</h2>
+            </div>
+            <CustomButton type="button" variant="ghost" iconOnly tooltip="Cerrar" onClick={handleClose} aria-label="Cerrar modal">
+              <FaTimes className="h-4 w-4" />
+            </CustomButton>
+          </header>
 
-        <form className="space-y-5 p-6" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            Usuario
-            <input
-              type="text"
-              required
-              value={form.Username}
-              onChange={(e) => setForm((f) => ({ ...f, Username: e.target.value }))}
-              placeholder="Ej. usuario_admin"
-              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            Correo
-            <input
-              type="email"
-              required
-              value={form.Correo}
-              onChange={(e) => setForm((f) => ({ ...f, Correo: e.target.value }))}
-              placeholder="ejemplo@correo.com"
-              className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-            />
-          </label>
-          {!modoEdicion ? (
+          <form className="space-y-5 p-6" onSubmit={handleSubmit}>
             <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-              Contraseña
+              Usuario
               <input
-                type="password"
-                autoComplete="new-password"
+                type="text"
                 required
-                value={form.Contrasena}
-                onChange={(e) => setForm((f) => ({ ...f, Contrasena: e.target.value }))}
-                className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                value={form.Username}
+                onChange={(e) => setForm((f) => ({ ...f, Username: e.target.value }))}
+                placeholder="Ej. usuario_admin"
+                className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               />
             </label>
-          ) : null}
 
-          <div className="flex justify-end gap-2 border-t border-indigo-100/80 pt-5">
-            <CustomButton type="button" variant="ghost" onClick={handleClose} disabled={isPending}>
-              Cancelar
-            </CustomButton>
-            <CustomButton
-              type="submit"
-              variant="primary"
-              className="bg-blue-600 text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"
-              disabled={isPending || confirmGuardarOpen}
-            >
-              {modoEdicion ? 'Actualizar' : 'Guardar'}
-            </CustomButton>
-          </div>
-        </form>
-      </section>
-    </div>
+            <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+              Correo
+              <input
+                type="email"
+                required
+                value={form.Correo}
+                onChange={(e) => setForm((f) => ({ ...f, Correo: e.target.value }))}
+                placeholder="ejemplo@correo.com"
+                disabled={modoEdicion}
+                className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+              />
+            </label>
+
+            {!modoEdicion ? (
+              <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+                Contraseña
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={form.Contrasena}
+                  onChange={(e) => setForm((f) => ({ ...f, Contrasena: e.target.value }))}
+                  className="h-11 rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                />
+              </label>
+            ) : null}
+
+            <div className="flex justify-end gap-2 border-t border-indigo-100/80 pt-5">
+              <CustomButton type="button" variant="ghost" onClick={handleClose} disabled={isPending}>
+                Cancelar
+              </CustomButton>
+              <CustomButton
+                type="submit"
+                variant="primary"
+                className="bg-blue-600 text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700"
+                disabled={isPending || confirmGuardarOpen}
+              >
+                {modoEdicion ? 'Actualizar' : 'Guardar'}
+              </CustomButton>
+            </div>
+          </form>
+        </section>
+      </div>
 
       <ConfirmacionDialog
         open={confirmGuardarOpen}

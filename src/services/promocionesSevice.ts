@@ -57,17 +57,17 @@ export async function getPromotion(): Promise<PromocionDTO[]> {
 		}
 	}
 }
-export async function getPromotionActive(id: number): Promise<PromocionDTO> {
+export async function getPromotionActive(): Promise<PromocionDTO> {
 	try {
-		const response = await apiSSO.get(`/promocion/obtenerPromocionesvigentes/${id}`);
+		const response = await apiSSO.get(`/promocion/obtenerPromocionesvigentes`);
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error)) {
 			console.error(`Error de API en obtenerPromocionesActivas: ${error.response?.status} - ${error.response?.data}`, error);
-			throw new Error(`Error ${error.response?.status}: No se pudo crear el anadido servicio.`);
+			throw new Error(`Error ${error.response?.status}: No se pudo obtener las promociones activas.`);
 		} else {
 			console.error('Error al obtener las promociones activas:', error);
-			throw new Error('Error inesperado al crear el anadido servicio.');
+			throw new Error('Error inesperado al obtener las promociones activas.');
 		}
 	}
 }

@@ -12,7 +12,7 @@ import {
 export const promocionesQueryKeys = {
   all: ['promociones'] as const,
   list: () => [...promocionesQueryKeys.all, 'list'] as const,
-  activeById: (id: number) => [...promocionesQueryKeys.all, 'active', id] as const,
+  active: () => [...promocionesQueryKeys.all, 'active'] as const,
 }
 
 type UsePromocionesListQueryOptions = {
@@ -31,11 +31,11 @@ export function usePromocionesListQuery(options?: UsePromocionesListQueryOptions
   })
 }
 
-export function usePromocionActiveQuery(id: number, options?: UsePromocionActiveQueryOptions) {
+export function usePromocionActiveQuery(options?: UsePromocionActiveQueryOptions) {
   return useQuery<PromocionDTO>({
-    queryKey: promocionesQueryKeys.activeById(id),
-    queryFn: () => getPromotionActive(id),
-    enabled: (options?.enabled ?? true) && Number.isFinite(id) && id > 0,
+    queryKey: promocionesQueryKeys.active(),
+    queryFn: () => getPromotionActive(),
+    enabled: options?.enabled ?? true,
   })
 }
 

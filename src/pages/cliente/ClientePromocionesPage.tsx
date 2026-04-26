@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { FaBullhorn, FaClock, FaFilter, FaRegCalendarCheck, FaSyncAlt, FaTags } from 'react-icons/fa'
 import { useAuth } from '@/hooks/useAuthContext'
-import { usePromocionesListQuery } from '@/hooks/usePromociones'
+import { usePromocionActiveQuery, usePromocionesListQuery } from '@/hooks/usePromociones'
 import type { PromocionDTO } from '@/services/promocionesSevice'
 import { CustomButton } from '@/components/Button'
 
@@ -28,11 +28,11 @@ export function ClientePromocionesPage() {
   const { user } = useAuth()
   const [vista, setVista] = useState<VistaPromocion>('todas')
   const [expandedPromos, setExpandedPromos] = useState<number[]>([])
-  const { data = [], isPending, isError, error, refetch, isFetching } = usePromocionesListQuery()
+  const { data = [], isPending, isError, error, refetch, isFetching } = usePromocionActiveQuery()
 
   const vigentes = useMemo(() => {
     const now = new Date()
-    return data.filter((row) => {
+    return (data as PromocionDTO[]).filter((row) => {
       const inicio = toDate(row.fechaInicio)
       const fin = toDate(row.fechaFin)
       return !Number.isNaN(inicio.getTime()) && !Number.isNaN(fin.getTime()) && now >= inicio && now <= fin

@@ -53,9 +53,9 @@ export async function createCita(data: CitaCreacionDTO): Promise<RespuestaDTO> {
   }
 }
 
-export async function getCitasByBarbero(idBarbero: number): Promise<CitaDTO> {
+export async function getCitasByBarbero(idBarbero: number): Promise<CitaDetalladaDTO[]> {
   try {
-    const response = await apiSSO.get(`/cita/obtenerCitasXbarbero/${idBarbero}`)
+    const response = await apiSSO.get(`/cita/obtenerListadoDetalladoXBarbero/${idBarbero}`)
     return response.data
   } catch (error) {
     if (axios.isAxiosError(error)) {

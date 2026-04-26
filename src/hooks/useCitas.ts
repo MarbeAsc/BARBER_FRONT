@@ -5,7 +5,6 @@ import {
   getCitasByUserId,
   type CitaCreacionDTO,
   type CitaDetalladaDTO,
-  type CitaDTO,
   type RespuestaDTO,
 } from '@/services/citaService'
 
@@ -22,7 +21,7 @@ type UseCitasByUserQueryOptions = {
   enabled?: boolean
 }
 export function useCitasByBarberoQuery(idBarbero: number, options?: UseCitasByBarberoQueryOptions) {
-  return useQuery<CitaDTO>({
+  return useQuery<CitaDetalladaDTO[]>({
     queryKey: citasQueryKeys.byBarbero(idBarbero),
     queryFn: () => getCitasByBarbero(idBarbero),
     enabled: (options?.enabled ?? true) && Number.isFinite(idBarbero) && idBarbero > 0,
@@ -30,7 +29,7 @@ export function useCitasByBarberoQuery(idBarbero: number, options?: UseCitasByBa
 }
 
 export function useCitasByUserQuery(idUser: number, options?: UseCitasByUserQueryOptions) {
-  return useQuery<CitaDetalladaDTO>({
+  return useQuery<CitaDetalladaDTO[]>({
     queryKey: citasQueryKeys.byUser(idUser),
     queryFn: () => getCitasByUserId(idUser),
     enabled: (options?.enabled ?? true) && Number.isFinite(idUser) && idUser > 0,

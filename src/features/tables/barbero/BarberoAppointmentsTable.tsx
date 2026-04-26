@@ -2,18 +2,17 @@
 import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { CustomButton } from '../../../components/Button'
 import { useCitasByBarberoQuery } from '@/hooks/useCitas'
-import type { CitaDTO } from '@/services/citaService'
+import type { CitaDetalladaDTO, ServicioCitaDetalladoDTO } from '@/services/citaService'
 import { useMemo } from 'react'
 
 
 type AppointmentRow = {
-  id: number
-  hora: string
-  fecha: string
-  cliente: string
-  servicio: string
-  total: string
-  estado: 'Pendiente' | 'Confirmada' | 'En curso' | 'Finalizada'
+  nombreCliente: string
+  nombrebarbero: string
+  fechaiInicio: string
+  fechaTermino: string
+  servicios: string
+  estatusDescripcion: string
 }
 
 type BarberoAppointmentsTableProps = {
@@ -29,68 +28,73 @@ function formatDate(value?: string) {
   return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
 }
 
-function formatHour(value?: string) {
-  if (!value) return 'Sin hora'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return 'Sin hora'
-  return new Intl.DateTimeFormat('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date)
-}
-
-function formatCurrency(value?: number) {
-  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value ?? 0)
-}
-
-function mapEstatusByCode(estatus?: number | null): AppointmentRow['estado'] {
-  if (estatus === 3) return 'Finalizada'
-  if (estatus === 2) return 'En curso'
-  if (estatus === 1) return 'Confirmada'
+function mapEstado(estatusDescripcion?: string): AppointmentRow['estatusDescripcion'] {
+  const normalized = estatusDescripcion?.trim().toLowerCase() ?? ''
+  if (normalized.includes('confirm')) return 'Confirmada'
+  if (normalized.includes('reprogram')) return 'Reprogramada'
   return 'Pendiente'
 }
 
-function badgeClass(status: AppointmentRow['estado']) {
+
+function badgeClass(status: AppointmentRow['estatusDescripcion']) {
   if (status === 'Finalizada') return 'bg-slate-200 text-slate-700'
   if (status === 'En curso') return 'bg-blue-100 text-blue-700'
   if (status === 'Confirmada') return 'bg-emerald-100 text-emerald-700'
   return 'bg-blue-100 text-blue-700'
 }
 
-export function BarberoAppointmentsTable({ idBarbero, onEdit, onDelete }: BarberoAppointmentsTableProps) {
+function normalizeRows(payload?: CitaDetalladaDTO[] | null): AppointmentRow[] {
+  if (!payload || payload.length === 0) return []
+
+  return payload.flatMap((cita) => {
+    const servicios = cita.servicios ?? []
+
+    if (servicios.length === 0) {
+      return [
+        {
+          nombreCliente: cita.nombreCliente?.trim() || 'Sin cliente',
+          nombrebarbero: 'Sin barbero',
+          fechaiInicio: formatDate(cita.fechaInicio),
+          fechaTermino: formatDate(cita.fechaTermino),
+          servicios: 'Sin servicio',
+          estatusDescripcion: cita.estatusDescripcion?.trim() || 'Sin estado',
+        },
+      ]
+    }
+
+    return servicios.map((servicio: ServicioCitaDetalladoDTO) => ({
+      nombreCliente: cita.nombreCliente?.trim() || 'Sin cliente',
+      nombrebarbero: servicio.nombreBarbero?.trim() || 'Sin barbero',
+      fechaiInicio: formatDate(cita.fechaInicio),
+      fechaTermino: formatDate(cita.fechaTermino),
+      servicios: servicio.nombreServicio?.trim() || 'Sin servicio',
+      estatusDescripcion: cita.estatusDescripcion?.trim() || 'Sin estado',
+    }))
+  })
+}
+
+export function BarberoAppointmentsTable({ idBarbero }: BarberoAppointmentsTableProps) {
   const { data, isPending, isError, error, refetch } = useCitasByBarberoQuery(idBarbero, {
     enabled: Number.isFinite(idBarbero) && idBarbero > 0,
   })
-  const rows = useMemo(() => {
-    if (!data) return []
-
-    const cita = data as CitaDTO
-    return [
-      {
-        id: cita.id,
-        hora: formatHour(cita.fechaInicio),
-        fecha: formatDate(cita.fechaInicio),
-        cliente: cita.idCliente ? `Cliente #${cita.idCliente}` : 'Sin cliente',
-        servicio: 'Sin servicio',
-        total: formatCurrency(0),
-        estado: mapEstatusByCode(cita.estatus),
-      },
-    ]
-  }, [data])
-
-  const activeCount = rows.filter((row) => row.estado === 'Confirmada' || row.estado === 'En curso').length
-  const pendingCount = rows.filter((row) => row.estado === 'Pendiente').length
-  const completedCount = rows.filter((row) => row.estado === 'Finalizada').length
+  const rows = useMemo(() => normalizeRows(data as CitaDetalladaDTO[]), [data])
 
   const columns: MRT_ColumnDef<AppointmentRow>[] = [
-    { accessorKey: 'fecha', header: 'Fecha' },
-    { accessorKey: 'hora', header: 'Hora' },
-    { accessorKey: 'cliente', header: 'Cliente' },
-    { accessorKey: 'servicio', header: 'Servicio' },
-    { accessorKey: 'total', header: 'Total' },
+    { accessorKey: 'nombreCliente', header: 'Cliente' },
+    { accessorKey: 'nombrebarbero', header: 'Barbero' },
+    { accessorKey: 'fechaiInicio', header: 'Fecha inicio' },
+    { accessorKey: 'fechaTermino', header: 'Fecha fin' },
+    { accessorKey: 'servicios', header: 'Servicio' },
     {
-      accessorKey: 'estado',
+      accessorKey: 'estatusDescripcion',
       header: 'Estado',
       Cell: ({ row }) => (
-        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass(row.original.estado)}`}>
-          {row.original.estado}
+        <span
+          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass(
+            mapEstado(row.original.estatusDescripcion)
+          )}`}
+        >
+          {row.original.estatusDescripcion}
         </span>
       ),
     },
@@ -223,13 +227,13 @@ export function BarberoAppointmentsTable({ idBarbero, onEdit, onDelete }: Barber
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-blue-600"
-              style={{ width: `${rows.length ? (activeCount / rows.length) * 100 : 0}%` }}
+              style={{ width: `${rows.length ? (rows.filter((row) => row.estatusDescripcion === 'Confirmada').length / rows.length) * 100 : 0}%` }}
             />
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium">
-            <span className="rounded-full bg-blue-50/80 px-2.5 py-1 text-blue-600">Activas: {activeCount}</span>
+            <span className="rounded-full bg-blue-50/80 px-2.5 py-1 text-blue-600">Confirmadas: {rows.filter((row) => row.estatusDescripcion === 'Confirmada').length}</span>
             <span className="rounded-full bg-indigo-50/80 px-2.5 py-1 text-indigo-600">
-              Pendientes/Finalizadas: {pendingCount + completedCount}
+              Pendientes/Finalizadas: {rows.filter((row) => row.estatusDescripcion === 'Pendiente' || row.estatusDescripcion === 'Finalizada').length}
             </span>
           </div>
         </div>
